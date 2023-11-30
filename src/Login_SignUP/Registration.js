@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom'
 import {
   MDBBtn,
   MDBContainer,
@@ -43,7 +44,7 @@ export default function Registration() {
             </div>
             <div className='notifier'>
             
-            <Notifier message={name} setMessage={setName} />
+         <Notifier message={name} setMessage={setName} />
             </div>
 
             <div className="d-flex flex-row align-items-center mb-4 ">
@@ -62,7 +63,7 @@ export default function Registration() {
 
             <div className="d-flex flex-row align-items-center mb-4">
               <MDBIcon fas icon="key me-3" size='lg'/>
-              <MDBInput label='Repeat your password' id='form4' type='password'/>
+              <MDBInput label='Confirm Password' id='form4' type='password'/>
               
             </div>
 
@@ -73,6 +74,10 @@ export default function Registration() {
 
             <MDBBtn className='mb-4' size='lg' onClick={handleClick} >Register</MDBBtn>
             <Notifier message={message} setMessage={setMessage} />
+            <Link to='/sign-in'>
+                Already have an account? Click here to  Sign In
+             </Link>
+            
 
           </MDBCol>
 

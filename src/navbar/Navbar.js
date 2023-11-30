@@ -49,7 +49,8 @@ function Navbar() {
                         onMouseEnter={onMouseEnter}
                         onMouseLeave={onMouseLeave}>
                         <Link to='/registration' className='nav-links' onClick={closeMobileMenu}>
-                            Registration <i className='fas fa-caret-down' />
+                            Registration 
+                        {/* <i className='fas fa-caret-down' /> */}
                         </Link>
                         {dropdown && <Dropdwon />}
                     </li>
