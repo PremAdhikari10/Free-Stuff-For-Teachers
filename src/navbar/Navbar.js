@@ -10,22 +10,22 @@ function Navbar() {
 
     const handleClick = () => setClick(!click)
     const closeMobileMenu = () => setClick(false)
-    
+
     const onMouseEnter = () => {
         if (window.innerWidth < 960) {
-          setDropdown(false);
+            setDropdown(false);
         } else {
-          setDropdown(true);
+            setDropdown(true);
         }
-      };
-    
-      const onMouseLeave = () => {
+    };
+
+    const onMouseLeave = () => {
         if (window.innerWidth < 960) {
-          setDropdown(false);
+            setDropdown(false);
         } else {
-          setDropdown(false);
+            setDropdown(false);
         }
-      };
+    };
     return (
         <>
             <nav className='navbar'>
@@ -39,39 +39,38 @@ function Navbar() {
                 </div>
                 <ul className={click ? 'nav-menu active' : 'nav-menu'}>
                     {/* Home tab */}
-                    <li className='nav-item'>
+                    <li className='nav-item'
+                        onMouseEnter={onMouseEnter}
+                        onMouseLeave={onMouseLeave}
+                    >
                         <Link to='/' className='nav-links' onClick={closeMobileMenu}>
                             Home
                         </Link>
                     </li>
                     {/* Services tab */}
-                    <li className='nav-item' 
-                        onMouseEnter={onMouseEnter}
-                        onMouseLeave={onMouseLeave}>
-                        <Link to='/registration' className='nav-links' onClick={closeMobileMenu}>
-                            Registration 
-                        {/* <i className='fas fa-caret-down' /> */}
-                        </Link>
-                        {dropdown && <Dropdwon />}
-                    </li>
-
                     <li className='nav-item'>
                         <Link to='/viewitems' className='nav-links' onClick={closeMobileMenu}>
                             View Items
                         </Link>
                     </li>
+
                     <li className='nav-item'>
-                        <Link to='/maps' className='nav-links' onClick={closeMobileMenu}>
-                        📍 Items Near Me
+                        <Link to='/add_items' className='nav-links' onClick={closeMobileMenu}>
+                            Add Items
                         </Link>
                     </li>
                     <li className='nav-item'>
-                    <Link to='/sign-in' className='nav-links' onClick={closeMobileMenu}>
-                        Sign In
-                    </Link>
+                        <Link to='/maps' className='nav-links' onClick={closeMobileMenu}>
+                            📍 Items Near Me
+                        </Link>
                     </li>
-                  </ul>
-                 
+                    <li className='nav-item'>
+                        <Link to='/sign-in' className='nav-links' onClick={closeMobileMenu}>
+                            Sign In
+                        </Link>
+                    </li>
+                </ul>
+
             </nav>
         </>
     )

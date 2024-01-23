@@ -10,7 +10,7 @@ import {
   MDBCardImage,
   MDBInput,
   MDBIcon,
-  MDBCheckbox,
+  MDBRadio
 }
 from 'mdb-react-ui-kit';
 import { Notifier } from '../components/pages/Notifier';
@@ -67,10 +67,11 @@ export default function Registration() {
               
             </div>
 
-            
-            <div className='mb-4'>
-              <MDBCheckbox name='flexCheck' value='' id='flexCheckDefault' label='Remember Password' />
-            </div>
+           <div className='d-flex flex-row align-items-center mb-4'>
+                  <h6 class="fw-bold mb-0 me-4">Role: </h6>
+                  <MDBRadio name='inlineRadio'  value='option1' label='Teacher' inline />
+                  <MDBRadio name='inlineRadio'  value='option2' label='Donor' inline />
+         </div> 
 
             <MDBBtn className='mb-4' size='lg' onClick={handleClick} >Register</MDBBtn>
             <Notifier message={message} setMessage={setMessage} />
