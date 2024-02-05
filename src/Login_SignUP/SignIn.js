@@ -39,7 +39,7 @@ export default function SignIn() {
 
               <MDBBtn className="mb-2 w-100" size="lg" style={{ backgroundColor: '#dd4b39' }}>
                 <MDBIcon fab icon="google" className="mx-2" />
-                Sign in with google
+                Sign in with Google
               </MDBBtn>
 
               <Link to='/registration'>
