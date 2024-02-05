@@ -1,7 +1,8 @@
 import React from 'react';
 import './App.css';
+import './index.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './components/pages/Home'
+import Home from './components/pages/Home';
 import ViewItems from './components/pages/ViewItems';
 import ItemsNearMe from './components/pages/ItemsNearMe';
 import AddItems from './components/pages/AddItems';
