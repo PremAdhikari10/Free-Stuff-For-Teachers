@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import './index.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -11,21 +11,40 @@ import Registration from './Login_SignUP/Registration';
 import Navbar from './navbar/Navbar';
 
 
-
 function App() {
-   return (
-      <Router>
-         <Navbar />
-         <Routes>
-            <Route path='/' exact element={<Home />} />
-            <Route path='/registration' exact element={<Registration />} />
-            <Route path='/viewitems' exact element={<ViewItems />} />
-            <Route path='/add_items' exact element={<AddItems />} />
-            <Route path='/maps' exact element={<ItemsNearMe />} />
-            <Route path='/sign-in' exact element={<SignIn />} />
-         </Routes>
+   const [currentUser, setCurrentUser] = useState(true);
+   useEffect(() => {
+      //current user && current uid 
+            
+   })
 
-      </Router>
+   return (
+      <div>
+         <Router>
+            <Navbar />
+            <Routes>
+
+               {currentUser ? (
+                  <>
+                     <Route path='/' exact element={<Home />} />
+                  </>
+               ) : (
+                  <>
+                     <Route path='/' exact element={<SignIn />} />
+                  </>
+               )}
+
+               <Route path='/' exact element={<Home />} />
+               <Route path='/registration' exact element={<Registration />} />
+               <Route path='/viewitems' exact element={<ViewItems />} />
+               <Route path='/add_items' exact element={<AddItems />} />
+               <Route path='/maps' exact element={<ItemsNearMe />} />
+               <Route path='/sign-in' exact element={<SignIn />} />
+            </Routes>
+
+         </Router>
+      </div>
+
    );
 }
 
