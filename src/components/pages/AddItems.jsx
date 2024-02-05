@@ -7,7 +7,7 @@ export default function AddItems() {
   function onChange() { }
   const [formData, setFormData] = useState({
     type: "rent",
-    name: ""
+    item_name: ""
   });
   const { type, name } = formData;
   return (
@@ -87,20 +87,20 @@ export default function AddItems() {
         <MDBInput wrapperClass='mb-4 w-100' 
         style={{ height: '70px'}} 
         label='Address' 
-        id='formControlLg' 
+        id='donor_address' 
         type='address' 
         size="lg" />
 
         <p className="text-lg mt-6 font-semibold"> Phone Number </p>
         <MDBInput wrapperClass='mb-4 w-100' 
         label='Phone Number' 
-        id='formControlLg' 
+        id='phone_number' 
         type='phone_number' 
         size="lg" />
           
         <p className="text-lg mt-6 font-semibold"> Description </p>
         <textarea className='mb-4 form-control' label= 'Description' 
-        style={{ height: '150px', width: '500px' }} id='formControlLg' />
+        style={{ height: '150px', width: '500px' }} id='description' />
 
         <div className="mb-6">
               <p className='texr-lg font-semibold'>Images</p>

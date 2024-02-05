@@ -14,29 +14,44 @@ export default function SignIn() {
   }
   
   return (
-      <section className="bg-cyan-100">
-          <h1 className="text-3xl text-center mt-6 font-bold">Sign In</h1>
-          <div className="flex justify-center flex-wrap items-center px-6 py-12 max-w-6xl mx-auto">
-              <div className="md:w-[67%] lg:w-[50%] mb-12 md:mb-6">
-                  <img src="https://images.unsplash.com/photo-1603796846097-bee99e4a601f?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-                      alt="signing" 
-                      className="w-full rounded-2xl"
-                  />
-              </div>
-              <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-                  <form>
-                      <input 
-                        className="w-full" 
-                        type="email" 
-                        id="email" 
-                        value={email} 
-                        onChange={onChange} 
-                        placeholder="Enter email"
-                        //className=""
-                      />
-                  </form>
-              </div>
-          </div>
-      </section>
-  )
+    <MDBContainer fluid>
+
+      <MDBRow className='d-flex justify-content-center align-items-center h-100'>
+        <MDBCol col='12'>
+
+          <MDBCard className='bg-white my-5 mx-auto' style={{ borderRadius: '1rem', maxWidth: '500px' }}>
+            <MDBCardBody className='p-5 w-100 d-flex flex-column'>
+
+              <h2 className="fw-bold mb-2 text-center">Sign In</h2>
+              <p className="text-white-50 mb-3">Please enter your login and password!</p>
+
+              <MDBInput wrapperClass='mb-4 w-100' label='Email address' id='formControlLg' type='email' size="lg" />
+              <MDBInput wrapperClass='mb-4 w-100' label='Password' id='formControlLg' type='password' size="lg" />
+
+              <MDBCheckbox name='flexCheck' id='flexCheckDefault' className='mb-4' label='Remember password' />
+
+              <MDBBtn size='lg'>
+                Login
+              </MDBBtn>
+
+              <hr className="my-4" />
+
+              <MDBBtn className="mb-2 w-100" size="lg" style={{ backgroundColor: '#dd4b39' }}>
+                <MDBIcon fab icon="google" className="mx-2" />
+                Sign in with Google
+              </MDBBtn>
+
+              <Link to='/registration'>
+                Don't Have Account? Register Here
+              </Link>
+
+            </MDBCardBody>
+          </MDBCard>
+
+        </MDBCol>
+      </MDBRow>
+
+    </MDBContainer>
+
+  );
 }
