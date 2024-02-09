@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import {
-  MDBInput,MDBBtn
+  MDBInput
 }from 'mdb-react-ui-kit';
 
 export default function AddItems() {
@@ -9,7 +9,16 @@ export default function AddItems() {
     type: "rent",
     item_name: ""
   });
-  const { type, name } = formData;
+  const { type, 
+          item_name,
+          quantity,
+          donor_name,
+          address,
+          phone_number,
+          description,
+          images,
+ } = formData;
+ 
   return (
     <main className="max-w-md px-2 mx-auto ">
       <h1 className="text-3xl text-center mt-6 font-bold ">Add Item</h1>
@@ -62,7 +71,7 @@ export default function AddItems() {
         </div>
         <p className="text-lg mt-6 font-semibold"> Item Name </p>
         <MDBInput wrapperClass='mb-4 w-100'
-         label='Name' id='formControlLg' 
+         label='Item Name' id='item_name' 
          type='item_name' size="lg" />
 
         <div className='flex space-x-9'>
@@ -70,14 +79,14 @@ export default function AddItems() {
             <p className="text-lg mt-6 font-semibold"> Quantity </p>
             <MDBInput wrapperClass='mb-4 w-25'
               label='qty'
-              id='formControlLg'
+              id='quantity'
               type='qty'
               size="lg" />
           </div>
           <div>
             <p className="text-lg mt-6 font-semibold"> Donor Name </p>
             <MDBInput wrapperClass='mb-4 w-200' label='Donor Name' 
-            id='formControlLg' 
+            id='donor_name' 
             type='donor_name'
             size="lg" />
           </div>
@@ -87,7 +96,7 @@ export default function AddItems() {
         <MDBInput wrapperClass='mb-4 w-100' 
         style={{ height: '70px'}} 
         label='Address' 
-        id='donor_address' 
+        id='address' 
         type='address' 
         size="lg" />
 
