@@ -8,6 +8,7 @@ import ItemsNearMe from './components/pages/ItemsNearMe';
 import AddItems from './components/pages/AddItems';
 import SignIn from './Login_SignUP/SignIn';
 import Registration from './Login_SignUP/Registration';
+import ForgotPassword from './Login_SignUP/ForgotPassword';
 import Navbar from './navbar/Navbar';
 
 
@@ -40,6 +41,8 @@ function App() {
                <Route path='/add_items' exact element={<AddItems />} />
                <Route path='/maps' exact element={<ItemsNearMe />} />
                <Route path='/sign-in' exact element={<SignIn />} />
+               <Route path='/forgot-password' exact element={<ForgotPassword />} />
+
             </Routes>
 
          </Router>

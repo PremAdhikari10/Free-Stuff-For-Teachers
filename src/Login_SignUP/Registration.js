@@ -1,96 +1,92 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'
+import { useState } from "react";
+import {IoEyeOff, IoEye} from "react-icons/io5";
+import { Link } from "react-router-dom";
 import {
-  MDBBtn,
-  MDBContainer,
-  MDBRow,
-  MDBCol,
-  MDBCard,
-  MDBCardBody,
-  MDBCardImage,
-  MDBInput,
-  MDBIcon,
   MDBRadio
 }
 from 'mdb-react-ui-kit';
-import { Notifier } from '../components/pages/Notifier';
-
 
 export default function Registration() {
-  const[message, setMessage] = useState("")
-  const[name, setName] = useState("")
- 
-  const handleClick = () => {
-    setMessage("This is prem")
-    setName("Wrong email")
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+  const { name, email, password } = formData;
+  function onChange(e) {
+    setFormData((prevState)=>({
+      ...prevState,
+      [e.target.id]: e.target.value,
+    }))
   }
- 
- 
- 
+  
   return (
-    <MDBContainer fluid>
+      <section className="bg-cyan-100">
+          <h1 className="text-3xl text-center mt-6 font-bold">Registration</h1>
+          <div className="flex justify-center flex-wrap items-center px-6 py-12 max-w-6xl mx-auto">
+              <div className="md:w-[67%] lg:w-[50%] mb-6 md:mb-3">
+                  <img src="https://images.unsplash.com/photo-1603796846097-bee99e4a601f?q=80&w=1374&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
+                      alt="signing" 
+                      className="w-full rounded-2xl"
+                  />
+              </div>
+              <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
+                  <form>
+                      <input  
+                        type="text" 
+                        id="name" 
+                        value={name} 
+                        onChange={onChange} 
+                        placeholder="First & Last Name"
+                        className="mb-3 w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out"
+                      />
+                      <input  
+                        type="email" 
+                        id="email" 
+                        value={email} 
+                        onChange={onChange} 
+                        placeholder="Enter email"
+                        className="mb-3 w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out"
+                      />
+                    <div className="relative mb-3">
+                      <input  
+                        type={showPassword ? "text" : "password"} 
+                        id="password" 
+                        value={password} 
+                        onChange={onChange} 
+                        placeholder="Password"
+                        className="w-full px-4 py-2 text-xl text-gray-700 bg-white border-gray-300 rounded transition ease-in-out"
+                      />
+                      {showPassword ? ( 
+                        <IoEyeOff className="absolute right-3 top-3 text-xl cursor-pointer" 
+                        onClick={() => setShowPassword
+                        ((prevState) => !prevState)}
+                        /> 
+                      ) : (
+                        <IoEye className="absolute right-3 top-3 text-xl cursor-pointer"
+                          onClick={() => setShowPassword
+                          ((prevState) => !prevState)} 
+                        />
+                      )}
+                    </div> 
+                    <div className='d-flex flex-row align-items-center mb-4 text-xl'>
+                      <h6 class="fw-bold mb-0 me-4 text-xl">Role: </h6>
+                        <MDBRadio name='inlineRadio'  value='option1' label='Teacher' inline />
+                        <MDBRadio name='inlineRadio'  value='option2' label='Donor' inline />
+                    </div> 
 
-    <MDBCard className='text-black m-5' style={{borderRadius: '25px'}}>
-      <MDBCardBody>
-        <MDBRow>
-          <MDBCol md='10' lg='6' className='order-2 order-lg-1 d-flex flex-column align-items-center'>
-
-            <p classNAme="text-center h1 fw-bold mb-5 mx-1 mx-md-4 mt-4">Registration</p>
-
-            <div className="d-flex flex-row align-items-center mb-4 ">
-              <MDBIcon fas icon="user me-3" size='lg'/>
-              <MDBInput label=' First Name' id='form1' type='text' className='w-100'/>
-            
-            </div>
-            <div className='notifier'>
-            
-         <Notifier message={name} setMessage={setName} />
-            </div>
-
-            <div className="d-flex flex-row align-items-center mb-4 ">
-              <MDBIcon fas icon="user me-3" size='lg'/>
-              <MDBInput label='Last Name' id='form1' type='text' className='w-100'/>
-            </div>
-            <div className="d-flex flex-row align-items-center mb-4">
-              <MDBIcon fas icon="envelope me-3" size='lg'/>
-              <MDBInput label='Your Email' id='form2' type='email'/>
-            </div>
-
-            <div className="d-flex flex-row align-items-center mb-4">
-              <MDBIcon fas icon="lock me-3" size='lg'/>
-              <MDBInput label='Password' id='form3' type='password'/>
-            </div>
-
-            <div className="d-flex flex-row align-items-center mb-4">
-              <MDBIcon fas icon="key me-3" size='lg'/>
-              <MDBInput label='Confirm Password' id='form4' type='password'/>
-              
-            </div>
-
-           <div className='d-flex flex-row align-items-center mb-4'>
-                  <h6 class="fw-bold mb-0 me-4">Role: </h6>
-                  <MDBRadio name='inlineRadio'  value='option1' label='Teacher' inline />
-                  <MDBRadio name='inlineRadio'  value='option2' label='Donor' inline />
-         </div> 
-
-            <MDBBtn className='mb-4' size='lg' onClick={handleClick} >Register</MDBBtn>
-            <Notifier message={message} setMessage={setMessage} />
-            <Link to='/sign-in'>
-                Already have an account? Click here to  Sign In
-             </Link>
-            
-
-          </MDBCol>
-
-          <MDBCol md='10' lg='6' className='order-1 order-lg-2 d-flex align-items-center'>
-            <MDBCardImage src='https://assets.caseys.com/m/be496110a18bce96/original/Cash-Classrooms-Donate-Hero.jpg' fluid/>
-          </MDBCol>
-
-        </MDBRow>
-      </MDBCardBody>
-    </MDBCard>
-
-  </MDBContainer>
-
-  );
+                    <div className="whitespace-nowrap text-sm sm:text-lg">
+                      <p className="mb-3 "> Already have an account? 
+                        <Link to="/sign-in" className="text-red-600 hover:text-red-800 transition duration-200 ease-in-out ml-1"> Sign in here </Link>
+                      </p>
+                    </div>
+                  </form>
+                  <button className="w-full bg-blue-500 text-white px-4 py-2 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-600 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800" type="submit">
+                    Register
+                  </button>
+              </div>
+          </div>
+      </section>
+  )
 }
