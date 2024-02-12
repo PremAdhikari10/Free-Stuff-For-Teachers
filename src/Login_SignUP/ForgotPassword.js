@@ -1,11 +1,24 @@
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
 
   function onChange(e) {
     setEmail(e.target.value);
+  }
+
+  async function onSubmit(e){
+    e.preventDefault()
+    try {
+      const auth = getAuth()
+      await sendPasswordResetEmail(auth, email)
+      toast.success("Email sent")
+    } catch (error) {
+      toast.error("Reset Password Failed")
+    }
   }
   
   return (
@@ -19,7 +32,7 @@ export default function ForgotPassword() {
                   />
               </div>
               <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-                  <form>
+                  <form onSubmit={onSubmit}>
                       <input  
                         type="email" 
                         id="email" 
@@ -36,10 +49,10 @@ export default function ForgotPassword() {
                         <Link to="/sign-in" className="text-blue-500 hover:text-blue-700 transition duration-200 ease-in-out ml-1">Sign in?</Link>
                       </p>
                     </div>
+                    <button className="w-full bg-blue-500 text-white px-4 py-2 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-600 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800" type="submit">
+                      Send to email
+                    </button>
                   </form>
-                  <button className="w-full bg-blue-500 text-white px-4 py-2 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-600 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800" type="submit">
-                    Send to email
-                  </button>
               </div>
           </div>
       </section>
