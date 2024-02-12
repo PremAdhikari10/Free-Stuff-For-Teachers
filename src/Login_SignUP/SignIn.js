@@ -1,6 +1,8 @@
 import { useState } from "react";
 import {IoEyeOff, IoEye} from "react-icons/io5";
-import { Link } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
+import { toast } from "react-toastify";
 
 export default function SignIn() {
   const [showPassword, setShowPassword] = useState(false);
@@ -9,11 +11,24 @@ export default function SignIn() {
     password: "",
   });
   const { email, password } = formData;
+  const navigate = useNavigate();
   function onChange(e) {
     setFormData((prevState)=>({
       ...prevState,
       [e.target.id]: e.target.value,
     }))
+  }
+  async function onSubmit(e) {
+    e.preventDefault()
+    try {
+      const auth = getAuth()
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      if (userCredential.user) {
+        navigate("/")
+      }
+    } catch (error) {
+        toast.error("Login Failed")
+    }
   }
   
   return (
@@ -27,7 +42,7 @@ export default function SignIn() {
                   />
               </div>
               <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-                  <form>
+                  <form onSubmit={onSubmit}>
                       <input  
                         type="email" 
                         id="email" 
@@ -65,10 +80,10 @@ export default function SignIn() {
                         <Link to="/registration" className="text-red-600 hover:text-red-800 transition duration-200 ease-in-out ml-1"> Register here </Link>
                       </p>
                     </div>
+                    <button className="w-full bg-blue-500 text-white px-4 py-2 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-600 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800" type="submit">
+                      Sign in
+                    </button>
                   </form>
-                  <button className="w-full bg-blue-500 text-white px-4 py-2 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-600 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800" type="submit">
-                    Sign in
-                  </button>
               </div>
           </div>
       </section>

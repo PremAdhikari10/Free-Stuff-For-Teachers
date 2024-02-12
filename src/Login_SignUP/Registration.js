@@ -1,10 +1,15 @@
 import { useState } from "react";
 import {IoEyeOff, IoEye} from "react-icons/io5";
 import { Link } from "react-router-dom";
+import {getAuth, createUserWithEmailAndPassword, updateProfile} from "firebase/auth";
+import {db} from "../firebase";
 import {
   MDBRadio
 }
 from 'mdb-react-ui-kit';
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 export default function Registration() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,12 +18,36 @@ export default function Registration() {
     email: "",
     password: "",
   });
+
   const { name, email, password } = formData;
+  const navigate = useNavigate();
   function onChange(e) {
     setFormData((prevState)=>({
       ...prevState,
       [e.target.id]: e.target.value,
     }))
+  }
+
+  async function onSubmit(e) {
+    e.preventDefault()
+
+    try {
+      const auth = getAuth()
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      updateProfile(auth.currentUser, {
+        displayName: name
+      })
+      const user = userCredential.user;
+      const formDataCopy = {...formData};
+      delete formDataCopy.password;
+      formDataCopy.timestamp = serverTimestamp();
+
+      await setDoc(doc(db, "users", user.uid), formDataCopy);
+      navigate("/");
+    } catch (error) {
+      toast.error("Something went wrong with Registration");     
+    }
   }
   
   return (
@@ -32,7 +61,7 @@ export default function Registration() {
                   />
               </div>
               <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-                  <form>
+                  <form onSubmit={onSubmit}>
                       <input  
                         type="text" 
                         id="name" 
@@ -71,7 +100,7 @@ export default function Registration() {
                       )}
                     </div> 
                     <div className='d-flex flex-row align-items-center mb-4 text-xl'>
-                      <h6 class="fw-bold mb-0 me-4 text-xl">Role: </h6>
+                      <h6 className="fw-bold mb-0 me-4 text-xl">Role: </h6>
                         <MDBRadio name='inlineRadio'  value='option1' label='Teacher' inline />
                         <MDBRadio name='inlineRadio'  value='option2' label='Donor' inline />
                     </div> 
@@ -81,10 +110,10 @@ export default function Registration() {
                         <Link to="/sign-in" className="text-red-600 hover:text-red-800 transition duration-200 ease-in-out ml-1"> Sign in here </Link>
                       </p>
                     </div>
+                    <button className="w-full bg-blue-500 text-white px-4 py-2 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-600 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800" type="submit">
+                      Register
+                    </button>
                   </form>
-                  <button className="w-full bg-blue-500 text-white px-4 py-2 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-600 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800" type="submit">
-                    Register
-                  </button>
               </div>
           </div>
       </section>
