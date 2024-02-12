@@ -44,6 +44,7 @@ export default function Registration() {
       formDataCopy.timestamp = serverTimestamp();
 
       await setDoc(doc(db, "users", user.uid), formDataCopy);
+      toast.success("User registered")
       navigate("/");
     } catch (error) {
       toast.error("Something went wrong with Registration");     
