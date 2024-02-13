@@ -1,78 +1,56 @@
-import React, { useState } from 'react'
-import './Navbar.css'
-import { Link } from 'react-router-dom'
+import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
+import {
+  MDBNavbar,
+  MDBContainer,
+  MDBIcon,
+  MDBNavbarNav,
+  MDBNavbarItem,
+  MDBNavbarToggler,
+  MDBNavbarBrand,
+  MDBCollapse
+} from 'mdb-react-ui-kit';
 
+export default function Navbar() {
+  const [openNavColor, setOpenNavColor] = useState(false);
 
-function Navbar() {
+  return (
+    <>
+     <MDBNavbar expand='lg' dark bgColor='primary'>
+  <MDBContainer fluid>
+    <MDBNavbarBrand as={NavLink} to='/'>Teacher's Aid</MDBNavbarBrand>
+    <MDBNavbarToggler
+      type='button'
+      data-target='#navbarColor02'
+      aria-controls='navbarColor02'
+      aria-expanded='false'
+      aria-label='Toggle navigation'
+      onClick={() => setOpenNavColor(!openNavColor)}
+    >
+      <MDBIcon icon='bars' fas />
+    </MDBNavbarToggler>
+    <MDBCollapse open={openNavColor} navbar>
+      <MDBNavbarNav className='justify-content-center mb-2 mb-lg-0 '>
+        <MDBNavbarItem>
+          <NavLink className='nav-link hover:bg-blue-400' activeClassName='active' exact to='/' style={{ color: 'white' }}>Home</NavLink>
+        </MDBNavbarItem>
+        <MDBNavbarItem>
+          <NavLink className='nav-link hover:bg-blue-400' activeClassName='active' exact to='/viewitems' style={{ color: 'white' }}>View Items</NavLink>
+        </MDBNavbarItem>
+        <MDBNavbarItem>
+          <NavLink className='nav-link hover:bg-blue-400' activeClassName='active' exact to='/add_items' style={{ color: 'white' }}>Add Items</NavLink>
+        </MDBNavbarItem>
+        <MDBNavbarItem>
+          <NavLink className='nav-link hover:bg-blue-400' activeClassName='active' exact to='/maps' style={{ color: 'white' }}>📍Items Near Me</NavLink>
+        </MDBNavbarItem>
+        <MDBNavbarItem>
+          <NavLink className='nav-link hover:bg-blue-400' activeClassName='active' exact to='/sign-in' style={{ color: 'white' }}>Sign in</NavLink>
+        </MDBNavbarItem>
+      </MDBNavbarNav>
+    </MDBCollapse>
+  </MDBContainer>
+</MDBNavbar>
 
-    const [click, setClick] = useState(false)
-    const [dropdown, setDropdown] = useState(false)
-
-    const handleClick = () => setClick(!click)
-    const closeMobileMenu = () => setClick(false)
-
-    const onMouseEnter = () => {
-        if (window.innerWidth < 960) {
-            setDropdown(false);
-        } else {
-            setDropdown(true);
-        }
-    };
-
-    const onMouseLeave = () => {
-        if (window.innerWidth < 960) {
-            setDropdown(false);
-        } else {
-            setDropdown(false);
-        }
-    };
-    return (
-        <>
-            <nav className='navbar'>
-                <Link to='/' className='navbar-logo'>
-                    Teachers Aid
-                </Link>
-
-                {/* Hamburger Menu */}
-                <div className='menu-icon' onClick={handleClick}>
-                    <i className={click ? 'fas fa-times' : 'fas fa-bars'} />
-                </div>
-                <ul className={click ? 'nav-menu active' : 'nav-menu'}>
-                    {/* Home tab */}
-                    <li className='nav-item'
-                        onMouseEnter={onMouseEnter}
-                        onMouseLeave={onMouseLeave}
-                    >
-                        <Link to='/' className='nav-links' onClick={closeMobileMenu}>
-                            Home
-                        </Link>
-                    </li>
-                    {/* Services tab */}
-                    <li className='nav-item'>
-                        <Link to='/viewitems' className='nav-links' onClick={closeMobileMenu}>
-                            View Items
-                        </Link>
-                    </li>
-
-                    <li className='nav-item'>
-                        <Link to='/add_items' className='nav-links' onClick={closeMobileMenu}>
-                            Add Items
-                        </Link>
-                    </li>
-                    <li className='nav-item'>
-                        <Link to='/maps' className='nav-links' onClick={closeMobileMenu}>
-                            📍 Items Near Me
-                        </Link>
-                    </li>
-                    <li className='nav-item'>
-                        <Link to='/sign-in' className='nav-links' onClick={closeMobileMenu}>
-                            Sign In
-                        </Link>
-                    </li>
-                </ul>
-
-            </nav>
-        </>
-    )
+    </>
+  );
 }
-export default Navbar;
