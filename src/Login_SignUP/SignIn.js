@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {IoEyeOff, IoEye} from "react-icons/io5";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword, getAuth } from "firebase/auth";
 import { toast } from "react-toastify";
 

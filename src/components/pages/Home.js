@@ -1,6 +1,7 @@
 import React from 'react'; 
 import { MDBCarousel, MDBCarouselItem} from 'mdb-react-ui-kit';
 export default function Home(){
+ 
   return (
     // header
     <MDBCarousel showIndicators showControls fade interval={2000}>
