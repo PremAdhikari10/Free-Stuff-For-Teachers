@@ -18,7 +18,6 @@ export default function AddItems() {
           description,
           images,
  } = formData;
- 
   return (
     <main className="max-w-md px-2 mx-auto ">
       <h1 className="text-3xl text-center mt-6 font-bold ">Add Item</h1>
@@ -85,7 +84,8 @@ export default function AddItems() {
           </div>
           <div>
             <p className="text-lg mt-6 font-semibold"> Donor Name </p>
-            <MDBInput wrapperClass='mb-4 w-200' label='Donor Name' 
+            <MDBInput wrapperClass='mb-4 w-200' 
+            label='Donor Name' 
             id='donor_name' 
             type='donor_name'
             size="lg" />
