@@ -40,7 +40,7 @@ export default function Navbar() {
     const docRef = doc(db, "users", currentUser.uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      console.log("Document data:", docSnap.data().role);
+   //   console.log("Document data:", docSnap.data().role);
       setRole(docSnap.data().role)
 
     } else {
@@ -122,22 +122,21 @@ export default function Navbar() {
               <MDBNavbarItem>
                 {currentUser && currentUser.uid ? (
                   <>
-                    <NavLink onClick={async () => handleLogOut()}
+                   
+                   <MDBNavbarNav className='justify-content-center mb-2 mb-lg-0 '><NavLink onClick={async () => handleLogOut()}
                       className='nav-link hover:bg-blue-400'
                       to='/sign-in'
                       style={{ color: 'white' }}>Sign Out </NavLink>
-                    <NavLink className='nav-link hover:bg-blue-400' to='/sign-in' style={{ color: 'white' }}>Hello {currentUser.displayName} </NavLink>
+                    <NavLink className='nav-link hover:bg-blue-400' to='/sign-in' style={{ color: 'white' }}>Hello,{currentUser.displayName} </NavLink></MDBNavbarNav>
+                    
                   </>
                 ) : (
                   <>
-                    <MDBNavbarItem>
+                    <MDBNavbarNav className='justify-content-center mb-2 mb-lg-0' >
                       <NavLink className='nav-link hover:bg-blue-400' to='/registration' style={{ color: 'white' }}>Register</NavLink>
                       <NavLink className='nav-link hover:bg-blue-400' to='/sign-in' style={{ color: 'white' }}>Sign in </NavLink>
-                    </MDBNavbarItem>
-                    
-                    
-
-                  </>
+                    </MDBNavbarNav>
+                     </>
                 )}
 
               </MDBNavbarItem>
