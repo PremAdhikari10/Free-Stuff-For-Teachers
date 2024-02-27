@@ -15,7 +15,7 @@ export default function AddItems() {
   const [category, setCategory] = useState("")
   const [itemName, setItemName] = useState("")
   const [quantity, setQuantity] = useState("")
-  const [donorName, setDonorName] = useState("Prem")
+  const [donorName, setDonorName] = useState("")
   const [address, setAddress] = useState("")
   const [description, setDescription] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
@@ -23,7 +23,9 @@ export default function AddItems() {
   const [currentUser, setCurrentUser] = useState(null)
   const [isSpinner, setIsSpinner] = useState(false)
   const [progressBar, setProgress] = useState(0)
-  
+  const [geolocationEnabled, setGeolocationEnabled] = useState(true)
+  const [latitude, setLatitude] = useState(0)
+  const [longitude, setLongitude] = useState(0)
 
 
   useEffect(() => {
@@ -42,17 +44,21 @@ export default function AddItems() {
     return () => unsubscribe();
   }, [])
 
-  const handleEvent = async(e) => {
+  const handleEvent = async (e) => {
     setIsSpinner(true)
-    
+
 
     console.log(itemName, category, quantity, address, description, phoneNumber, image)
 
-    if (image === "") {
-      alert("Image xaina")
+    if (itemName === "") {
+      toast.error("Enter item name")
+    }
+
+    else if (image === "") {
+      toast.error("Upload an image");
     }
     else {
-      var uid = await  uuidv4()
+      var uid = await uuidv4()
       const storageRef = ref(storage, uid);
       const uploadTask = uploadBytesResumable(storageRef, image);
       uploadTask.on('state_changed',
@@ -79,20 +85,23 @@ export default function AddItems() {
           // For instance, get the download URL: https://firebasestorage.googleapis.com/...
           getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
             try {
-              await setDoc(doc(db, currentUser.uid, uid), {
+              await setDoc(doc(db, "items", uid), {
                 category: category,
                 itemName: itemName,
                 quantity: quantity,
-                donorName: currentUser.displayName,
+                donorName: auth.currentUser.displayName,
                 address: address,
                 phoneNumber: phoneNumber,
                 description: description,
                 imageURL: downloadURL,
-                databaseName: uid
+                latitude:latitude,
+                longitude:longitude,
+                databaseName: uid,
+                userRef: auth.currentUser.uid
               })
-              toast.success("Added to database")
+              toast.success("Item added sucessfully!!")
 
-    
+
               setCategory("")
               setAddress("")
               setItemName("")
@@ -100,6 +109,8 @@ export default function AddItems() {
               setQuantity("")
               setPhoneNumber("")
               setImage("")
+              setLatitude("")
+              setLongitude("")
               navigate("/viewitems")
             }
 
@@ -149,12 +160,14 @@ export default function AddItems() {
         <div className='flex space-x-9'>
           <div>
             <p className="text-lg mt-6 font-semibold"> Quantity </p>
-            <MDBInput wrapperClass='mb-4 w-25'
+            <MDBInput wrapperClass='mb-4 w-28'
               label='qty'
               id='quantity'
-              type='qty'
+              type='number'
               size="lg"
               value={quantity}
+              min='1'
+              max='500'
               onChange={(e) => setQuantity(e.target.value)}
             />
 
@@ -181,6 +194,43 @@ export default function AddItems() {
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           size="lg" />
+
+        {!geolocationEnabled && (
+          <div className="flex space-x-6 justify-start mb-6">
+            <div className="">
+              <p className="text-lg font-semibold">Latitude</p>
+              <input type="number"
+                id="latitude"
+                value={latitude}
+                onChange={(e) => setLatitude(e.target.value)}
+                required
+                min="-90"
+                max="90"
+                className='w-full px-4 py-2 text-xl text-gray-700 
+               bg-white border border-gray-300 rounded 
+               transition duration-150 ease-in-out
+                focus:bg-white focus:text-gray-700 
+                focus:border-slate-600 text-center'/>
+            </div>
+            <div className="">
+              <p className="text-lg font-semibold">Longitude</p>
+              <input type="number"
+                id="longitude"
+                value={longitude}
+                onChange={(e) => setLongitude(e.target.value)}
+                required
+                min="-180"
+                max="180"
+                className='w-full px-4 py-2 text-xl text-gray-700 
+               bg-white border border-gray-300 rounded 
+               transition duration-150 ease-in-out
+                focus:bg-white focus:text-gray-700 
+                focus:border-slate-600 text-center'/>
+            </div>
+
+          </div>
+        )}
+
 
         <p className="text-lg mt-6 font-semibold"> Phone Number </p>
         <MDBInput wrapperClass='mb-4 w-100'

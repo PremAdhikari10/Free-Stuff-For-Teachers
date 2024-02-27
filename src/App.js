@@ -16,6 +16,7 @@ import { auth, db } from './firebase'
 import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import Unauthorized from './Login_SignUP/Unauthorized';
 
+
 const App = () => {
 
    const [currentUser, setCurrentUser] = useState(null);
@@ -41,7 +42,7 @@ const App = () => {
       const docRef = doc(db, "users", currentUser.uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-         console.log("Document data:", docSnap.data().role);
+         // console.log("Document data:", docSnap.data().role);
          setRole(docSnap.data().role)
 
       } else {
