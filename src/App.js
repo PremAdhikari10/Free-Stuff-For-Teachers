@@ -4,7 +4,7 @@ import './index.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/pages/Home';
 import ViewItems from './components/pages/ViewItems';
-import ItemsNearMe from './components/pages/ItemsNearMe';
+import ItemsNearMe from './components/pages/ItemsNearMe'; // Import the ItemsNearMe component
 import AddItems from './components/pages/AddItems';
 import SignIn from './Login_SignUP/SignIn';
 import Registration from './Login_SignUP/Registration';
@@ -14,11 +14,10 @@ import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
-   const [currentUser, setCurrentUser] = useState(true);
+   const [currentUser, setCurrentUser] = useState(true); // Example state for current user, adjust as needed
    useEffect(() => {
       //current user && current uid 
-            
-   })
+   }, []);
 
    return (
       <div>
@@ -36,11 +35,10 @@ function App() {
                   </>
                )}
 
-               <Route path='/' exact element={<Home />} />
                <Route path='/registration' exact element={<Registration />} />
                <Route path='/viewitems' exact element={<ViewItems />} />
                <Route path='/add_items' exact element={<AddItems />} />
-               <Route path='/maps' exact element={<ItemsNearMe />} />
+               <Route path='/maps' exact element={<ItemsNearMe />} /> {/* Add this route */}
                <Route path='/sign-in' exact element={<SignIn />} />
                <Route path='/forgot-password' exact element={<ForgotPassword />} />
 
@@ -60,7 +58,6 @@ function App() {
             theme="dark"
          />
       </div>
-
    );
 }
 
