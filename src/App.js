@@ -9,6 +9,7 @@ import AddItems from './components/AddItems';
 import SignIn from './Login_SignUP/SignIn';
 import Registration from './Login_SignUP/Registration';
 import ForgotPassword from './Login_SignUP/ForgotPassword';
+import EditItems from './components/EditItems';
 import Navbar from './navbar/Navbar';
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -67,15 +68,18 @@ const App = () => {
                {currentUser && currentUser.uid ? (
                   <>
                      <Route path='/viewitems' exact element={<ViewItems />} />
-
+                     
                      {
                         (role === 'Donor') ? (
                            <>
                               <Route path='/add_items' exact element={<AddItems />} />
+                              <Route path='/edit-items/:databaseName' exact element={<EditItems />} />
                            </>
                         ) : (
                            <>
                             <Route path='/add_items' exact element={<Unauthorized />} />
+                            <Route path='/edit-items/:databaseName' exact element={<Unauthorized/>} />
+
                            </>
                         )
                      }
@@ -86,6 +90,7 @@ const App = () => {
                      <Route path='/viewitems' exact element={<SignIn />} />
                      <Route path='/add_items' exact element={<SignIn />} />
                      <Route path='/maps' exact element={<SignIn />} />
+                     <Route path="/edit-items/:databaseName" exact element={<SignIn />}/>
                   </>
                )}
 

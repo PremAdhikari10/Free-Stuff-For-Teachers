@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { auth, db } from '../firebase'
-import { collection, getDocs, where, doc, deleteDoc } from 'firebase/firestore'
+import { auth, db, storage } from '../firebase'
+import { collection, getDocs, getDoc, doc, deleteDoc } from 'firebase/firestore'
 import { toast } from "react-toastify";
 import {
   MDBContainer,
@@ -17,12 +17,15 @@ import {
 import "./ViewItems.css";
 import { CiLocationOn } from "react-icons/ci";
 import { MdOutlineProductionQuantityLimits } from "react-icons/md";
+import { getStorage, ref, deleteObject } from 'firebase/storage';
+
 
 const ViewItems = () => {
 
   const [items, setItems] = useState([]);
   const [currentUser, setCurrentUser] = useState("");
   const [itemCollection, setItemCollection] = useState([]);
+  const [role, setRole] = useState();
 
   const navigate = useNavigate("/")
   useEffect(() => {
@@ -46,36 +49,26 @@ const ViewItems = () => {
 
   useEffect(() => {
     if (currentUser && currentUser.uid) {
-      getUseritems();
-    }
-    else {
       getItems();
+      getRole();
     }
+
   }, [currentUser]);
 
 
-  //userItems:
-  const getUseritems = async () => {
+  const getRole = async () => {
+    const docRef = doc(db, "users", currentUser.uid);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      //  console.log("Document data:", docSnap.data().role);
+      setRole(docSnap.data().role)
 
-    try {
-
-
-      const querySnapshot = await getDocs(collection(db, 'items'), where('items.databaName==', currentUser.userRef))
-      const userData = [];
-      querySnapshot.forEach(doc => {
-        userData.push(doc.data());
-      });
-      //console.log(userData)
-
-    } catch (error) {
-      toast.error("Error fetching user data:", error);
-      navigate('/')
+    } else {
+      // docSnap.data() will be undefined in this case
+      console.log("No such document!");
     }
 
-
   }
-
-
 
   //all items:
   const getItems = async () => {
@@ -95,114 +88,127 @@ const ViewItems = () => {
 
   }
 
-//delete items
+  //delete items
 
-const deleteItem =async(databaseName)=>{
-  try{
-    await deleteDoc(doc(db, 'items', databaseName));
-     // After deletion, update the UI to reflect the changes
-    setItemCollection(prevItems => prevItems.filter(item => item.databaseName !== databaseName));
-    toast.success("Item deleted successfully");
-  }catch(error){
-      toast.error("Error deleting item:",error);
+  const deleteItem = async (databaseName) => {
+    if (window.confirm("Are you sure you want to delete the item?")) {
+      try {
+        await deleteDoc(doc(db, 'items', databaseName));
+        //delete items from the storage:
+
+        const storageRef = ref(storage, databaseName);
+        await deleteObject(storageRef);
+        // After deletion, update the UI to reflect the changes
+        setItemCollection(prevItems => prevItems.filter(item => item.databaseName !== databaseName));
+        toast.success("Item deleted successfully");
+      } catch (error) {
+        toast.error("Error deleting item:", error);
+      }
+    }
   }
-}
-
+  function onEdit(databaseName) {
+    navigate(`/edit-items/${databaseName}`);
+  }
 
   return (
     <div>
       <h4 className="mt-4 mb-5 text-center">
         <strong>View Items</strong>
       </h4>
-     {itemCollection.map((items,index)=>(
-        <MDBContainer fluid key={index}>
-        <MDBRow className="justify-content-center mb-0">
-          <MDBCol md="12" xl="10">
-            <MDBCard className="shadow-0 border rounded-3 mt-5 mb-3">
-              <MDBCardBody>
-                <MDBRow>
-                  <MDBCol md="12" lg="3" className="mb-4 mb-lg-0">
-                    <MDBRipple
-                      rippleColor="light"
-                      rippleTag="div"
-                      className="bg-image rounded hover-zoom hover-overlay"
-                    >
-                      <MDBCardImage
-                        src={items.imageURL}
-                        fluid
-                        className="w-100"
-                      />
-                      <a href="#!">
-                        <div
-                          className="mask"
-                          style={{ backgroundColor: "rgba(251, 251, 251, 0.15)" }}
-                        ></div>
-                      </a>
-                    </MDBRipple>
-                  </MDBCol>
-                  <MDBCol md="6">
-                    <h5>{items.itemName}</h5>
-                    <div className="d-flex flex-row">
-                      <div className="text-danger mb-1 me-2">
-                      <CiLocationOn style={{ fontSize: '1.5em' }} />
+      {itemCollection.map((items, databaseName) => (
+        <MDBContainer fluid key={databaseName}>
+          <MDBRow className="justify-content-center mb-0">
+            <MDBCol md="12" xl="10">
+              <MDBCard className="shadow-0 border rounded-3 mt-5 mb-3">
+                <MDBCardBody>
+                  <MDBRow>
+                    <MDBCol md="12" lg="3" className="mb-4 mb-lg-0">
+                      <MDBRipple
+                        rippleColor="light"
+                        rippleTag="div"
+                        className="bg-image rounded hover-zoom hover-overlay"
+                      >
+                        <MDBCardImage
+                          src={items.imageURL}
+                          fluid
+                          className="w-100"
+                        />
+                        <a href="#!">
+                          <div
+                            className="mask"
+                            style={{ backgroundColor: "rgba(251, 251, 251, 0.15)" }}
+                          ></div>
+                        </a>
+                      </MDBRipple>
+                    </MDBCol>
+                    <MDBCol md="6">
+                      <h5>{items.itemName}</h5>
+                      <div className="d-flex flex-row">
+                        <div className="text-danger mb-1 me-2">
+                          <CiLocationOn style={{ fontSize: '1.5em' }} />
+                        </div>
+                        <span>{items.address}</span>
                       </div>
-                      <span>{items.address}</span>
-                    </div>
-                    <div className="text-truncate mb-4 mb-md-0">
-                      <span>Donor Name : </span>
-                      <span> {items.donorName} </span>
-                    </div>
-                    <div className="text-truncate mb-4 mb-md-0">
-                      <span>Category : </span>
-                      <span className="text-primary"></span>
-                      <span>{items.category}</span>
-                    </div>
-                    <p className="text-truncate mb-4 mb-md-0">
-                    Phone Number : {items.phoneNumber}
-                    </p>
-                  </MDBCol>
-                  <MDBCol
-                    md="6"
-                    lg="3"
-                    className="border-sm-start-none border-start"
-                  >
-                    <div className="d-flex flex-row align-items-center mb-1">
-                      <h4 className="mb-1 me-1">
-                        <MdOutlineProductionQuantityLimits />
-                      </h4>
-                      <span className="text-danger">
-                        Quantity: {items.quantity}
-                      </span>
-                    </div>
-                    <h6 className="text-success">Free Items</h6>
-                    <div className="d-flex flex-column mt-4">
-                      <MDBBtn color="primary" size="sm">
-                        View Details
-                      </MDBBtn>
-                      { currentUser && currentUser.uid === items.userRef ? (
-                        <>
-                      <MDBBtn color="danger" size="sm" 
-                      className="mt-2" 
-                      onClick={() => deleteItem(items.databaseName)}>
-                        Delete Item
-                      </MDBBtn>
-                      
-                      <MDBBtn outline color="primary" size="sm" className="mt-2" >
-                        Edit Item
-                      </MDBBtn>
-                     </>):(  <MDBBtn outline color="primary" size="sm" className="mt-2">
-                        Add to Cart
-                      </MDBBtn>)}
-                     
-                    </div>
-                  </MDBCol>
-                </MDBRow>
-              </MDBCardBody>
-            </MDBCard>
-          </MDBCol>
-        </MDBRow>
-      </MDBContainer>
-     ))}
+                      <div className="text-truncate mb-4 mb-md-0">
+                        <span>Donor Name : </span>
+                        <span> {items.donorName} </span>
+                      </div>
+                      <div className="text-truncate mb-4 mb-md-0">
+                        <span>Category : </span>
+                        <span className="text-primary"></span>
+                        <span>{items.category}</span>
+                      </div>
+                      <p className="text-truncate mb-4 mb-md-0">
+                        Phone Number : {items.phoneNumber}
+                      </p>
+                    </MDBCol>
+                    <MDBCol
+                      md="6"
+                      lg="3"
+                      className="border-sm-start-none border-start"
+                    >
+                      <div className="d-flex flex-row align-items-center mb-1">
+                        <h4 className="mb-1 me-1">
+                          <MdOutlineProductionQuantityLimits />
+                        </h4>
+                        <span className="text-danger">
+                          Quantity: {items.quantity}
+                        </span>
+                      </div>
+                      <h6 className="text-success">Free Items</h6>
+                      <div className="d-flex flex-column mt-4">
+                        <MDBBtn color="primary" size="sm">
+                          View Details
+                        </MDBBtn>
+                        {currentUser && currentUser.uid === items.userRef && role === "Donor" ? (
+                          <>
+                            <MDBBtn color="danger" size="sm"
+                              className="mt-2"
+                              onClick={() => deleteItem(items.databaseName)}>
+                              Delete Item
+                            </MDBBtn>
+
+                            <MDBBtn outline color="primary" size="sm" className="mt-2 w-100" onClick={()=>onEdit(items.databaseName)}>
+                              Edit Item
+                            </MDBBtn>
+
+
+
+
+
+                          </>) : (<MDBBtn outline color="primary" size="sm" className="mt-2">
+                            Add to Cart
+                          </MDBBtn>)}
+
+                      </div>
+                    </MDBCol>
+                  </MDBRow>
+                </MDBCardBody>
+              </MDBCard>
+            </MDBCol>
+          </MDBRow>
+        </MDBContainer>
+      ))}
 
     </div>
   )
