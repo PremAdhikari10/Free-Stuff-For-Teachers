@@ -5,13 +5,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form, ListGroup, Button } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
 import { collection, query, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
+import { db } from '../firebase';
 
 function ItemsNearMe() {
   const [userLocation, setUserLocation] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
   const [map, setMap] = useState(null);
+  const [itemsNearMe, setItemsNearMe] = useState([]);
 
   useEffect(() => {
     if (!navigator.geolocation || !L) return;
@@ -29,69 +30,106 @@ function ItemsNearMe() {
     );
   }, []);
 
-  useEffect(() => {
-    if (!userLocation || !L || !map) return;
-
-    map.setView([userLocation.lat, userLocation.lng], 13);
-
-  }, [userLocation, map]);
-
   const mapRef = useRef(null);
 
   useEffect(() => {
     const fetchDataFromFirestore = async () => {
       try {
-        const q = query(collection(db, 'items'));
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach((doc) => {
-          const item = doc.data();
-          const { address, itemName } = item;
-          if (address) {
-            fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=b4308f04963a43c69e7ff49ffa81ec64&countrycode=us`)
-              .then(response => response.json())
-              .then(data => {
-                if (data && data.results && data.results.length > 0) {
-                  const { lat, lng } = data.results[0].geometry;
-                  L.marker([lat, lng]).addTo(map).bindPopup(itemName);
-                }
-              })
-              .catch(error => {
-                console.error('Error fetching item location:', error);
-              });
-          }
+        const querySnapshot = await getDocs(collection(db, 'items'));
+        const items = [];
+        querySnapshot.forEach(doc => {
+          items.push(doc.data());
         });
+        setItemsNearMe(items);
       } catch (error) {
         console.error('Error fetching data from Firestore:', error);
       }
     };
-
+  
     if (!userLocation || !L || mapRef.current !== null) return;
-
-    const mapInstance = L.map('map').setView([userLocation.lat, userLocation.lng], 5);
-
+  
+    const mapInstance = L.map('map').setView([userLocation.lat, userLocation.lng], 9); // Set the zoom level here
+  
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(mapInstance);
-
+  
     mapInstance.setMaxBounds([
       [24.396308, -125.0],
       [49.384358, -66.93457]
     ]);
-
+  
     mapInstance.on('drag', function () {
       mapInstance.panInsideBounds([
         [24.396308, -125.0],
         [49.384358, -66.93457]
       ], { animate: false });
     });
-
+  
     mapRef.current = mapInstance;
     setMap(mapInstance);
-
+  
     fetchDataFromFirestore();
-  }, [userLocation, map]);
+  }, [userLocation]);
+  
 
+  useEffect(() => {
+    if (!map) return;
+
+    itemsNearMe.forEach(item => {
+      const { address, itemName } = item;
+      if (address) {
+        fetchLocationAndAddMarker(address, itemName);
+      }
+    });
+  }, [map, itemsNearMe]);
+
+  const fetchLocationAndAddMarker = async (address, itemName, imageURL) => {
+    try {
+      const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=b4308f04963a43c69e7ff49ffa81ec64&countrycode=us`);
+      const data = await response.json();
+      if (data.results && data.results.length > 0) {
+        const { lat, lng } = data.results[0].geometry;
+        const icon = L.divIcon({
+          className: 'custom-marker',
+          html: `<img src="${imageURL}" alt="${itemName}" style="width: 50px; height: 50px;">`,
+          iconSize: [50, 50],
+          iconAnchor: [25, 50]
+        });
+        L.marker([lat, lng], { icon }).addTo(map).bindPopup(itemName);
+      } else {
+        console.error('Location not found for address:', address);
+      }
+    } catch (error) {
+      console.error('Error fetching location for address:', address, error);
+    }
+  };
+  
+  useEffect(() => {
+    if (!map) return;
+  
+    const addedMarkers = new Map(); // Keep track of added markers
+  
+    itemsNearMe.forEach((item, index) => {
+      const { address, itemName, imageURL } = item;
+      if (address) {
+        const key = `${address}_${index}`; // Use a unique key for each marker
+        const existingMarker = addedMarkers.get(key);
+        if (!existingMarker) {
+          fetchLocationAndAddMarker(address, itemName, imageURL);
+          addedMarkers.set(key, { count: 1 }); // Mark address as added
+        } else {
+          // Address already added, adjust position slightly to prevent overlapping
+          const adjustedLat = item.lat + (Math.random() - 0.5) / 1500;
+          const adjustedLng = item.lng + (Math.random() - 0.5) / 1500;
+          fetchLocationAndAddMarker(adjustedLat, adjustedLng, itemName, imageURL);
+          addedMarkers.set(key, { count: existingMarker.count + 1 }); // Increase count
+        }
+      }
+    });
+  }, [map, itemsNearMe]);
+  
   const handleSearch = () => {
     fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(searchQuery)}&key=b4308f04963a43c69e7ff49ffa81ec64&countrycode=us`)
       .then(response => response.json())
