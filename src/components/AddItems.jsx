@@ -10,6 +10,7 @@ import { doc, setDoc } from 'firebase/firestore';
 import { toast } from "react-toastify";
 import { useNavigate } from 'react-router-dom';
 
+
 export default function AddItems() {
   const navigate = useNavigate()
   const [category, setCategory] = useState("")
