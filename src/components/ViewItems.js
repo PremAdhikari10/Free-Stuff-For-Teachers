@@ -228,6 +228,7 @@ const ViewItems = () => {
                                 color="primary"
                                 size="sm"
                                 className="mt-2"
+                                onClick={()=>onEdit(item.databaseName)}
                               >
                                 Edit Item
                               </MDBBtn>
