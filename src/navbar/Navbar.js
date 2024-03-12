@@ -127,7 +127,7 @@ export default function Navbar() {
                       className='nav-link hover:bg-blue-400'
                       to='/sign-in'
                       style={{ color: 'white' }}>Sign Out </NavLink>
-                    <NavLink className='nav-link hover:bg-blue-400' to='/sign-in' style={{ color: 'white' }}>Hello,{currentUser.displayName} </NavLink></MDBNavbarNav>
+                    <NavLink className='nav-link hover:bg-blue-400' to='/sign-in' style={{ color: 'white' }}>Hello, {currentUser.displayName} </NavLink></MDBNavbarNav>
                     
                   </>
                 ) : (
