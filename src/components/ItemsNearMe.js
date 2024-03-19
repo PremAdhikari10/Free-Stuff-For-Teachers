@@ -4,7 +4,8 @@ import L from 'leaflet';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form, ListGroup, Button } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
-import { collection, query, getDocs } from 'firebase/firestore';
+
+import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 
 function ItemsNearMe() {
