@@ -84,7 +84,11 @@ export default function AddItems() {
       setIsSpinner(false);
       return;
     }
-  
+    //  if(phoneNumber!==10){
+    //   toast.error("Please enter valid Phone Number");
+    //   setIsSpinner(false);
+    //   return;
+    // }
     if (image === "") {
       toast.error("Upload an image");
       setIsSpinner(false);

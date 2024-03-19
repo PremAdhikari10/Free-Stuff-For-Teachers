@@ -1,136 +1,111 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { auth, db, storage } from '../firebase'
-import { collection, getDocs, getDoc, doc, deleteDoc } from 'firebase/firestore'
+import { collection, deleteDoc, doc, getDocs, query, where } from 'firebase/firestore';
+import React, { useEffect, useState } from 'react'
+import { auth, db, storage } from '../firebase';
+import { getAuth } from 'firebase/auth';
+import { deleteObject, ref } from 'firebase/storage';
 import { toast } from "react-toastify";
+import { Link, useNavigate } from 'react-router-dom';
 import {
-  MDBContainer,
-  MDBRow,
-  MDBCol,
-  MDBCard,
-  MDBCardBody,
-  MDBCardImage,
-  MDBIcon,
-  MDBRipple,
-  MDBBtn,
-} from "mdb-react-ui-kit";
-import "./ViewItems.css";
-import { CiLocationOn } from "react-icons/ci";
-import { MdOutlineProductionQuantityLimits } from "react-icons/md";
-import { getStorage, ref, deleteObject } from 'firebase/storage';
+    MDBContainer,
+    MDBRow,
+    MDBCol,
+    MDBCard,
+    MDBCardBody,
+    MDBCardImage,
+    MDBIcon,
+    MDBRipple,
+    MDBBtn,
+  } from "mdb-react-ui-kit";
+  import "./ViewItems.css";
+  import { CiLocationOn } from "react-icons/ci";
+  import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 
+const MyListings = () => {
+    const auth = getAuth()
+    const [itemCollection, setItemCollection] = useState([]);
+    const navigate = useNavigate("/");
 
-const ViewItems = () => {
-  const [items, setItems] = useState([]);
-  const [currentUser, setCurrentUser] = useState("");
-  const [itemCollection, setItemCollection] = useState([]);
-  const [role, setRole] = useState();
-  const [selectedCategory, setSelectedCategory] = useState('');
-  const [categories, setCategories] = useState([]);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [categories, setCategories] = useState([]);
 
-  const navigate = useNavigate("/")
-  
-  useEffect(() => {
-    // Firebase Auth listener
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        // User is signed in.
-        setCurrentUser(user);
-        // Fetch data when component mounts
-      } else {
-        // User is signed out.
-        setCurrentUser(null);
-      }
-    });
+    const [currentUser, setCurrentUser] = useState("");
+    useEffect(() => {
+        // Firebase Auth listener
+        const unsubscribe = auth.onAuthStateChanged((user) => {
+          if (user) {
+            // User is signed in.
+            setCurrentUser(user);
+            // Fetch data when component mounts
+          } else {
+            // User is signed out.
+            setCurrentUser(null);
+          }
+        });
+    
+        // Cleanup function
+        return () => unsubscribe();
+      }, []);
+    
+    useEffect(() => {
+        userListings();
+        fetchCategories();
+    }, [auth.currentUser.uid])
 
-    // Cleanup function
-    return () => unsubscribe();
-  }, []);
+    const userListings = async () => {
+        try {
+            const listingRef = collection(db, 'items');
+            const q = query(listingRef, where("userRef", "==", auth.currentUser.uid))
+            const querySnap = await getDocs(q);
+            let listings = [];
 
-
-
-  useEffect(() => {
-    if (currentUser && currentUser.uid) {
-      getItems();
-      getRole();
-    }
-    fetchCategories();
-  }, [currentUser]);
-
-
-
-  const getRole = async () => {
-    const docRef = doc(db, "users", currentUser.uid);
-    const docSnap = await getDoc(docRef);
-    if (docSnap.exists()) {
-      //  console.log("Document data:", docSnap.data().role);
-      setRole(docSnap.data().role)
-
-    } else {
-      // docSnap.data() will be undefined in this case
-      console.log("No such document!");
+            querySnap.forEach((doc) => {
+                listings.push(doc.data())
+            })
+            // console.log(listings)
+            setItemCollection(listings)
+        }
+        catch (error) {
+            toast.error("Error fetching user data:", error);
+            navigate('/')
+        }
     }
 
-  }
 
-  //all items:
-  const getItems = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'items'));
-      const allItems = [];
-      querySnapshot.forEach(doc => {
-        allItems.push(doc.data());
-      });
-     // console.log(allItems);
-      // Check the data being fetched
-      setItemCollection(allItems);
-    } catch (error) {
-      toast.error("Error fetching user data:", error);
-      navigate('/')
+    const deleteItem = async (databaseName) => {
+        if (window.confirm("Are you sure you want to delete the item?")) {
+            try {
+                await deleteDoc(doc(db, 'items', databaseName));
+                //delete items from the storage:
+
+                const storageRef = ref(storage, databaseName);
+                await deleteObject(storageRef);
+                // After deletion, update the UI to reflect the changes
+                setItemCollection(prevItems => prevItems.filter(item => item.databaseName !== databaseName));
+                toast.success("Item deleted successfully");
+            } catch (error) {
+                toast.error("Error deleting item:", error);
+            }
+        }
     }
-
-  }
-//get user item:
-
-
-  //delete items
-
-  const deleteItem = async (databaseName) => {
-    if (window.confirm("Are you sure you want to delete the item?")) {
-      try {
-        await deleteDoc(doc(db, 'items', databaseName));
-        //delete items from the storage:
-
-        const storageRef = ref(storage, databaseName);
-        await deleteObject(storageRef);
-        // After deletion, update the UI to reflect the changes
-        setItemCollection(prevItems => prevItems.filter(item => item.databaseName !== databaseName));
-        toast.success("Item deleted successfully");
-      } catch (error) {
-        toast.error("Error deleting item:", error);
-      }
+    function onEdit(databaseName) {
+        navigate(`/edit-items/${databaseName}`);
     }
-  }
-  function onEdit(databaseName) {
-    navigate(`/edit-items/${databaseName}`);
-  }
-  const fetchCategories = async () => {
-    try {
-      const querySnapshot = await getDocs(collection(db, 'categories'));
-      const categoriesData = querySnapshot.docs.map((doc) => doc.data().name);
-      setCategories(categoriesData);
-    } catch (error) {
-      toast.error('Error fetching categories:', error);
-      navigate('/');
-    }
-  };
+    const fetchCategories = async () => {
+        try {
+            const querySnapshot = await getDocs(collection(db, 'categories'));
+            const categoriesData = querySnapshot.docs.map((doc) => doc.data().name);
+            setCategories(categoriesData);
+        } catch (error) {
+            toast.error('Error fetching categories:', error);
+            navigate('/');
+        }
+    };
+    return (
 
-  return (
-    <div>
-      <h4 className="mt-4 mb-5 text-center">
-        <strong>View Items</strong>
-      </h4>
-      <div className="mb-4">
+        <div><h4 className="mt-4 mb-5 text-center">
+            <strong>My Listings</strong>
+        </h4>
+        <div className="mb-4">
         <label htmlFor="categoryFilter" className="form-label">
           Filter by Category:
         </label>
@@ -254,15 +229,9 @@ const ViewItems = () => {
             </MDBRow>
           </MDBContainer>
         ))}
-    </div>
-  )
+        </div>
+
+    )
 }
-export default ViewItems;
- 
-  
 
-  
-
- 
-
-  
+export default MyListings
