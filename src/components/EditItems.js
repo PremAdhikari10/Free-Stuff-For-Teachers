@@ -6,10 +6,9 @@ import Spinner from 'react-bootstrap/Spinner';
 import { auth, db, storage } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from 'uuid';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { toast } from "react-toastify";
-import { useNavigate } from 'react-router-dom';
-
+import { useNavigate, useParams } from 'react-router-dom';
 
 export default function AddItems() {
   const navigate = useNavigate()
@@ -27,6 +26,7 @@ export default function AddItems() {
   const [geolocationEnabled, setGeolocationEnabled] = useState(true)
   const [latitude, setLatitude] = useState(0)
   const [longitude, setLongitude] = useState(0)
+  const[item,setItem]=useState(null)
 
 
   useEffect(() => {
@@ -45,97 +45,160 @@ export default function AddItems() {
     return () => unsubscribe();
   }, [])
 
+  const params =useParams()
+  //fetch listing
+    useEffect(()=>{
+            async function fetchListing(){
+                    const docRef =doc(db,"items",params.databaseName)
+                    //get data from firestore
+                    const docSnap = await getDoc(docRef);
+
+                    if(docSnap.exists()){
+                        const data= docSnap.data();
+                        setItem(data);
+                        setCategory(data.category || "");
+                        setItemName(data.itemName || "");
+                        setQuantity(data.quantity || "");
+                        setDonorName(data.donorName || "");
+                        setAddress(data.address || "");
+                        setDescription(data.description || "");
+                        setPhoneNumber(data.phoneNumber || "");
+                        setImage(data.image || "");
+                        setLatitude(data.latitude || 0);
+                        setLongitude(data.longitude || 0);
+                    }
+                    else{
+                        navigate("/")
+                        toast.error("Item does not exist!!")
+                    }
+            }
+            fetchListing();
+    },[])
+
+
   const handleEvent = async (e) => {
-    setIsSpinner(true)
+    setIsSpinner(true);
 
-
-    console.log(itemName, category, quantity, address, description, phoneNumber, image)
-
-    if (itemName === "" ||category==="" || donorName==="" || quantity===""|| address===""||description===""||phoneNumber==="") {
-      toast.error("Please complete all the input field")
+    if (itemName === "" || category === "" || donorName === "" || quantity === "" || address === "" || description === "" || phoneNumber === "") {
+      toast.error("Please complete all the input fields");
       setIsSpinner(false);
       return;
     }
-    // else if(phoneNumber!==10){
+    //  if(phoneNumber!==10){
     //   toast.error("Please enter valid Phone Number");
     //   setIsSpinner(false);
     //   return;
     // }
-    else if (image === "") {
+    if (image === "") {
       toast.error("Upload an image");
       setIsSpinner(false);
       return;
     }
-    else {
-      var uid = await uuidv4()
-      const storageRef = ref(storage, uid);
-      const uploadTask = uploadBytesResumable(storageRef, image);
-      uploadTask.on('state_changed',
-        (snapshot) => {
-          // Observe state change events such as progress, pause, and resume
-          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setProgress(progress)
-          switch (snapshot.state) {
-            case 'paused':
-              console.log('Upload is paused');
-              break;
-            case 'running':
-              console.log('Upload is running');
-              break;
+  
+    try {
+      setIsSpinner(true);
+      if (item) {
+       // Update existing item
+        if(image!==""){
+             // If a new image is selected, upload it and update imageURL
+        const uid = item.databaseName;
+        const storageRef = ref(storage, uid);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setProgress(progress);
+          },
+          (error) => {
+            toast.error("Something went wrong");
+            setIsSpinner(false);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            await updateDoc(doc(db, "items", uid), {
+              category: category,
+              itemName: itemName,
+              quantity: quantity,
+              donorName: auth.currentUser.displayName,
+              address: address,
+              phoneNumber: phoneNumber,
+              description: description,
+              imageURL: downloadURL,
+              latitude: latitude,
+              longitude: longitude,
+            });
+            toast.success("Item updated successfully!!");
+            navigate("/viewitems");
+            setIsSpinner(false);
           }
-        },
-        (error) => {
-          // Handle unsuccessful uploads
-          toast.error("Something went wrong")
-          setIsSpinner(false);
-        },
-        () => {
-          // Handle successful uploads on complete
-          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-          getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-            try {
-              await setDoc(doc(db, "items", uid), {
-                category: category,
-                itemName: itemName,
-                quantity: quantity,
-                donorName: auth.currentUser.displayName,
-                address: address,
-                phoneNumber: phoneNumber,
-                description: description,
-                imageURL: downloadURL,
-                latitude:latitude,
-                longitude:longitude,
-                databaseName: uid,
-                userRef: auth.currentUser.uid
-              })
-              toast.success("Item added sucessfully!!")
-
-
-              setCategory("")
-              setAddress("")
-              setItemName("")
-              setDescription("")
-              setQuantity("")
-              setPhoneNumber("")
-              setImage("")
-              setLatitude("")
-              setLongitude("")
-              navigate("/viewitems")
-            }
-
-            catch (error) {
-              toast.error(error.message)
-              setIsSpinner(false)
-            }
-
-          });
-
+        );
         }
-      );
+        else{
+            //if no new image is selected
+         await updateDoc(doc(db, "items", item.databaseName), {
+          category: category,
+          itemName: itemName,
+          quantity: quantity,
+          donorName: auth.currentUser.displayName,
+          address: address,
+          phoneNumber: phoneNumber,
+          description: description,
+          latitude: latitude,
+          longitude: longitude,
+        });
+        toast.success("Item updated successfully!!");
+        navigate("/viewitems");
+      } 
+        }// Update existing item
+        
+      
+      //add new item logic
+      else {
+        // Add new item
+        const uid = await uuidv4();
+        const storageRef = ref(storage, uid);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+  
+        uploadTask.on(
+          "state_changed",
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            setProgress(progress);
+          },
+          (error) => {
+            toast.error("Something went wrong");
+            setIsSpinner(false);
+          },
+          async () => {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            await setDoc(doc(db, "items", uid), {
+              category: category,
+              itemName: itemName,
+              quantity: quantity,
+              donorName: auth.currentUser.displayName,
+              address: address,
+              phoneNumber: phoneNumber,
+              description: description,
+              imageURL: downloadURL,
+              latitude: latitude,
+              longitude: longitude,
+              databaseName: uid,
+              userRef: auth.currentUser.uid,
+            });
+            toast.success("Item added successfully!!");
+            navigate("/viewitems");
+            setIsSpinner(false);
+          }
+        );
+      }
+    } catch (error) {
+      toast.error(error.message);
+      setIsSpinner(false);
     }
-
-    e.preventDefault()
+  
+    e.preventDefault();
   }
 
   
@@ -144,7 +207,7 @@ export default function AddItems() {
 
   return (
     <main className="max-w-md px-2 mx-auto ">
-      <h1 className="text-3xl text-center mt-6 font-bold ">Add Item</h1>
+      <h1 className="text-3xl text-center mt-6 font-bold ">Update Item</h1>
       <form onSubmit={(e) => e.preventDefault()}>
         <p className="text-lg mt-6 font-semibold"> Category </p>
         <div className="flex">
@@ -291,7 +354,7 @@ export default function AddItems() {
         <button onClick={(e) => handleEvent(e)} className="mb-4 w-full px-7
         py-3 bg-blue-600 text-white font-medium text-sm 
         uppercase rounded shadow-md hover:bg-blue-700 focus:shadow-lg active: bg-blue-800 active:shadow-lg 
-        transition duration-150 ease-in-out">Add Item</button>
+        transition duration-150 ease-in-out">Update Item</button>
         {
           isSpinner ? (
             <>

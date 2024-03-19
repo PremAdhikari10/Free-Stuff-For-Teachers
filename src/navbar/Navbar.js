@@ -101,6 +101,9 @@ export default function Navbar() {
                           <MDBNavbarItem>
                             <NavLink className='nav-link hover:bg-blue-400' to='/add_items' style={{ color: 'white' }}>Add Items</NavLink>
                           </MDBNavbarItem>
+                          <MDBNavbarItem>
+                            <NavLink className='nav-link hover:bg-blue-400' to='/my_listings' style={{ color: 'white' }}>My Listings</NavLink>
+                          </MDBNavbarItem>
                         </>
                       ) : (
                         <>
@@ -127,7 +130,7 @@ export default function Navbar() {
                       className='nav-link hover:bg-blue-400'
                       to='/sign-in'
                       style={{ color: 'white' }}>Sign Out </NavLink>
-                    <NavLink className='nav-link hover:bg-blue-400' to='/sign-in' style={{ color: 'white' }}>Hello,{currentUser.displayName} </NavLink></MDBNavbarNav>
+                    <NavLink className='nav-link hover:bg-blue-400' to='/' style={{ color: 'white' }}>Hello, {currentUser.displayName} </NavLink></MDBNavbarNav>
                     
                   </>
                 ) : (
