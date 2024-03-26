@@ -13,10 +13,18 @@ import {
   MDBNavbarBrand,
   MDBCollapse
 } from 'mdb-react-ui-kit';
+<<<<<<< Updated upstream
+=======
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import "../navbar/Navbar.css";
+import { HiOutlineUserCircle } from "react-icons/hi2";
+import logo from "../assets/logo.png";
+>>>>>>> Stashed changes
 
 export default function Navbar() {
   const navigate = useNavigate()
   const [currentUser, setCurrentUser] = useState("")
+  const [isShowProfile, setIsShowProfile] = useState(false);
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) {
@@ -36,6 +44,7 @@ export default function Navbar() {
   const [openNavColor, setOpenNavColor] = useState(false);
   const handleLogOut = async () => {
     signOut(auth)
+<<<<<<< Updated upstream
         .then(() => {
             toast.success("User logged out.");
             navigate('/sign-in')
@@ -44,12 +53,29 @@ export default function Navbar() {
             toast.error("There is an error logging out.");
         });
 };
+=======
+      .then(() => {
+        toast.success("User logged out.");
+        navigate('/sign-in');
+        toggleDropDown();
+      })
+      .catch((error) => {
+        toast.error("There is an error logging out.");
+      });
+  };
+>>>>>>> Stashed changes
+
+  const toggleDropDown = () => {
+    setIsShowProfile(!isShowProfile); //to toggle between true and false
+  }
 
   return (
-    <>
+    <div>
       <MDBNavbar expand='lg' dark bgColor='primary'>
         <MDBContainer fluid>
-          <MDBNavbarBrand as={NavLink} to='/'>Teacher's Aid</MDBNavbarBrand>
+          <MDBNavbarBrand as={NavLink} to='/'>
+            <img src={logo} alt='logo' className='logo'/>
+          </MDBNavbarBrand>
           <MDBNavbarToggler
             type='button'
             data-target='#navbarColor02'
@@ -60,6 +86,7 @@ export default function Navbar() {
           >
             <MDBIcon icon='bars' fas />
           </MDBNavbarToggler>
+<<<<<<< Updated upstream
           <MDBCollapse open={openNavColor} navbar>
             <MDBNavbarNav className='justify-content-center mb-2 mb-lg-0 '>
               <MDBNavbarItem>
@@ -88,13 +115,89 @@ export default function Navbar() {
                     <NavLink className='nav-link hover:bg-blue-400' activeClassName='active' exact to='/sign-in' style={{ color: 'white' }}>Sign in </NavLink>
                   </>
                 )}
-
+=======
+          <MDBCollapse open={openNavColor} navbar style={{height: "auto"}}>
+            <MDBNavbarNav className='justify-content-end mb-2 mb-lg-0 '>
+              <MDBNavbarItem >
+                <NavLink className='nav-link hover:bg-blue-400' to='/' style={{ color: 'white' }}>Home</NavLink>
               </MDBNavbarItem>
+
+              {
+                currentUser && currentUser.uid ? (
+                  <>
+
+                    <MDBNavbarItem>
+                      <NavLink className='nav-link hover:bg-blue-400' to='/viewitems' style={{ color: 'white' }}>View Items</NavLink>
+                    </MDBNavbarItem>
+                    {
+                      role === "Donor" ? (
+                        <>
+                          <MDBNavbarItem>
+                            <NavLink className='nav-link hover:bg-blue-400' to='/add_items' style={{ color: 'white' }}>Add Items</NavLink>
+                          </MDBNavbarItem>
+                          <MDBNavbarItem>
+                            <NavLink className='nav-link hover:bg-blue-400' to='/my_listings' style={{ color: 'white' }}>My Listings</NavLink>
+                          </MDBNavbarItem>
+                        </>
+                      ) : (
+                        <>
+
+                        </>
+                      )
+                    }
+
+                    <MDBNavbarItem>
+                      <NavLink className='nav-link hover:bg-blue-400' to='/maps' style={{ color: 'white' }}>📍Items Near Me</NavLink>
+                    </MDBNavbarItem>
+                  </>
+                ) : (
+                  <>
+                  </>
+                )
+              }
+
+              {currentUser && currentUser.uid ? (
+                  <div className='profile_info_wrapper'>
+                    <MDBNavbarItem>
+                      <HiOutlineUserCircle className='teacher_user-icon' onClick={toggleDropDown}/>
+                    </MDBNavbarItem>
+                    {
+                      isShowProfile &&
+                      <div className='profile_info'>
+                        <NavLink className='nav-link hover:bg-blue-400' to='/' style={{ color: 'white' }}>Hello, {currentUser.displayName} </NavLink>
+                        <NavLink
+                          onClick={async () => handleLogOut()}
+                          className='nav-link hover:bg-blue-400'
+                          to='/sign-in'
+                          style={{ color: 'white' }}
+                        >
+                        Sign Out
+                        </NavLink>
+                      </div>
+                    }
+                  </div>
+                ) : (
+                  <>
+                    <NavLink className='nav-link hover:bg-blue-400' to='/registration' style={{ color: 'white' }}>Register</NavLink>
+                    <NavLink className='nav-link hover:bg-blue-400' to='/sign-in' style={{ color: 'white' }}>Sign in </NavLink>
+                  </>
+                )
+              }
+>>>>>>> Stashed changes
+
             </MDBNavbarNav>
           </MDBCollapse>
         </MDBContainer>
       </MDBNavbar>
 
+<<<<<<< Updated upstream
     </>
+=======
+      {
+        isShowProfile && 
+        <div className='screen_wrapper' onClick={toggleDropDown}/>
+      }
+    </div>
+>>>>>>> Stashed changes
   );
 }
