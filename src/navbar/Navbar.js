@@ -129,6 +129,7 @@ console.log(user)
                     <MDBNavbarItem>
                       <NavLink className='nav-link hover:bg-blue-400' to='/maps' style={{ color: 'white' }}>📍Items Near Me</NavLink>
                     </MDBNavbarItem>
+                    
                   </>
                 ) : (
                   <>
@@ -176,4 +177,3 @@ console.log(user)
     </div>
   );
     }
-    
