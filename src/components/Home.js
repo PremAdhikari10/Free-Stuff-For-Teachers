@@ -11,6 +11,7 @@ export default function Home(){
       <img src='https://media1.s-nbcnews.com/i/newscms/2019_25/2904476/190620-student-teachers-classroom-stock-cs-502p_e4bbcb02cc8f70402ff6ce4a9735f6ef.jpg' className='d-block w-100' style={{height: '500px'}} alt='...' />
     </MDBCarouselItem>
   
+  
     <MDBCarouselItem itemId={2}>
       <img src='https://www.adoptaclassroom.org/wp-content/uploads/2021/03/school-children.jpeg' className='d-block w-100' style={{height: '500px'}} alt='...' />
     </MDBCarouselItem>
