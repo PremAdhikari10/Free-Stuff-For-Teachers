@@ -16,7 +16,7 @@ function ItemsNearMe() {
   const [userLocation, setUserLocation] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [map, setMap] = useState(null);
+  const [map, setMap] = useState(null); 
   const [itemsNearMe, setItemsNearMe] = useState([]);
   const markerClusterGroup = useRef(null); 
 
