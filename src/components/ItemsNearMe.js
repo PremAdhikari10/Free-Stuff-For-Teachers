@@ -18,7 +18,7 @@ function ItemsNearMe() {
   const [searchResults, setSearchResults] = useState([]);
   const [map, setMap] = useState(null);
   const [itemsNearMe, setItemsNearMe] = useState([]);
-  const markerClusterGroup = useRef(null);
+  const markerClusterGroup = useRef(null); 
 
   useEffect(() => {
     if (!navigator.geolocation || !L) return;
