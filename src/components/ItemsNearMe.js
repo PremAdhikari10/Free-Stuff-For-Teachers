@@ -4,6 +4,10 @@ import L from 'leaflet';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Form, ListGroup, Button } from 'react-bootstrap';
 import { FaSearch } from 'react-icons/fa';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+//npm install leaflet.markercluster
+import 'leaflet.markercluster';
 
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
@@ -14,6 +18,7 @@ function ItemsNearMe() {
   const [searchResults, setSearchResults] = useState([]);
   const [map, setMap] = useState(null);
   const [itemsNearMe, setItemsNearMe] = useState([]);
+  const markerClusterGroup = useRef(null);
 
   useEffect(() => {
     if (!navigator.geolocation || !L) return;
@@ -46,42 +51,44 @@ function ItemsNearMe() {
         console.error('Error fetching data from Firestore:', error);
       }
     };
-  
+
     if (!userLocation || !L || mapRef.current !== null) return;
-  
+
     const mapInstance = L.map('map').setView([userLocation.lat, userLocation.lng], 9); // Set the zoom level here
-  
+
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(mapInstance);
-  
+
     mapInstance.setMaxBounds([
       [24.396308, -125.0],
       [49.384358, -66.93457]
     ]);
-  
+
     mapInstance.on('drag', function () {
       mapInstance.panInsideBounds([
         [24.396308, -125.0],
         [49.384358, -66.93457]
       ], { animate: false });
     });
-  
+
     mapRef.current = mapInstance;
     setMap(mapInstance);
-  
+
+    markerClusterGroup.current = L.markerClusterGroup();
+    mapInstance.addLayer(markerClusterGroup.current);
+
     fetchDataFromFirestore();
   }, [userLocation]);
-  
 
   useEffect(() => {
     if (!map) return;
 
     itemsNearMe.forEach(item => {
-      const { address, itemName } = item;
+      const { address, itemName, imageURL } = item;
       if (address) {
-        fetchLocationAndAddMarker(address, itemName);
+        fetchLocationAndAddMarker(address, itemName, imageURL);
       }
     });
   }, [map, itemsNearMe]);
@@ -98,7 +105,8 @@ function ItemsNearMe() {
           iconSize: [50, 50],
           iconAnchor: [25, 50]
         });
-        L.marker([lat, lng], { icon }).addTo(map).bindPopup(itemName);
+        const marker = L.marker([lat, lng], { icon }).bindPopup(itemName);
+        markerClusterGroup.current.addLayer(marker); // Add marker to the cluster group
       } else {
         console.error('Location not found for address:', address);
       }
@@ -106,31 +114,7 @@ function ItemsNearMe() {
       console.error('Error fetching location for address:', address, error);
     }
   };
-  
-  useEffect(() => {
-    if (!map) return;
-  
-    const addedMarkers = new Map(); // Keep track of added markers
-  
-    itemsNearMe.forEach((item, index) => {
-      const { address, itemName, imageURL } = item;
-      if (address) {
-        const key = `${address}_${index}`; // Use a unique key for each marker
-        const existingMarker = addedMarkers.get(key);
-        if (!existingMarker) {
-          fetchLocationAndAddMarker(address, itemName, imageURL);
-          addedMarkers.set(key, { count: 1 }); // Mark address as added
-        } else {
-          // Address already added, adjust position slightly to prevent overlapping
-          const adjustedLat = item.lat + (Math.random() - 0.5) / 1500;
-          const adjustedLng = item.lng + (Math.random() - 0.5) / 1500;
-          fetchLocationAndAddMarker(adjustedLat, adjustedLng, itemName, imageURL);
-          addedMarkers.set(key, { count: existingMarker.count + 1 }); // Increase count
-        }
-      }
-    });
-  }, [map, itemsNearMe]);
-  
+
   const handleSearch = () => {
     fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(searchQuery)}&key=b4308f04963a43c69e7ff49ffa81ec64&countrycode=us`)
       .then(response => response.json())
@@ -185,20 +169,20 @@ function ItemsNearMe() {
   };
 
   return (
-    <div style={{ position: 'relative' }}>
-      <div id="map" style={{ width: '100%', height: 'calc(100vh - 50px)' }}></div>
-      <div className="position-fixed top-20 end-0 p-3 bg-light" style={{ zIndex: 1000 }}>
+    <div style={{ position: 'relative', height: '100vh', overflow: 'hidden' }}>
+      <div id="map" style={{ width: '100%', height: 'calc(100% - 50px)' }}></div>
+      <div className="position-fixed bottom-0 start-50 translate-middle-x p-3 bg-light" style={{ zIndex: 1000 }}>
         <div className="d-flex align-items-center mb-2">
           <Form.Control
             type="text"
             placeholder="Search location (include state)"
             value={searchQuery}
             onChange={handleInputChange}
-            style={{ width: '300px', fontSize: '1.1rem' }}
+            style={{ width: '100%', maxWidth: '300px', fontSize: '1.1rem' }}
           />
           <Button onClick={handleSearch} className="ms-2"><FaSearch /></Button>
         </div>
-        <ListGroup style={{ maxHeight: '200px', overflowY: 'auto', width: '300px' }}>
+        <ListGroup style={{ maxHeight: '200px', overflowY: 'auto', width: '100%', maxWidth: '300px' }}>
           {searchResults.map((result, index) => (
             <ListGroup.Item key={index} action onClick={() => handleSelectSuggestion(result)}>
               {result}
@@ -208,6 +192,8 @@ function ItemsNearMe() {
       </div>
     </div>
   );
+  
 }
 
 export default ItemsNearMe;
+
