@@ -1,6 +1,6 @@
 import React from 'react'; 
 import { MDBCarousel, MDBCarouselItem} from 'mdb-react-ui-kit';
-import Footer from './Footer';
+import Footer from '../Footer';
 export default function Home(){
  
   return (
