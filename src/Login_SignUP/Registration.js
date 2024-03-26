@@ -90,8 +90,10 @@ export default function Registration() {
           await setDoc(doc(db, "users", user.uid), {
             name: name,
             email: email,
-            role: role,
-            timetamp: serverTimestamp()
+            role: role,    
+            timetamp: serverTimestamp(),
+            uid: user.uid
+
           });
           toast.success("User registered")
           navigate("/");
@@ -162,7 +164,8 @@ export default function Registration() {
                 <Link to="/sign-in" className="text-red-600 hover:text-red-800 transition duration-200 ease-in-out ml-1"> Sign in here </Link>
               </p>
             </div>
-            <button className="w-full bg-blue-500 text-white px-4 py-2 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-600 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800" type="submit">
+            <button className="w-full bg-blue-500 text-white px-4 py-2 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-600 transition duration-150 ease-in-out hover:shadow-lg active:bg-blue-800" 
+            type="submit">
               Register
             </button>
           </form>
