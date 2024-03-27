@@ -83,8 +83,10 @@ console.log(user)
     <div>
       <MDBNavbar expand='lg' dark bgColor='primary'>
         <MDBContainer fluid>
-          <MDBNavbarBrand as={NavLink} to='/'>
-            <img src={logo} alt='logo' className='logo'/>
+          <MDBNavbarBrand>
+            <NavLink to='/'>
+              <img src={logo} alt='logo' className='logo'/>
+            </NavLink>
           </MDBNavbarBrand>
           <MDBNavbarToggler
             type='button'
@@ -109,6 +111,7 @@ console.log(user)
                     <MDBNavbarItem>
                       <NavLink className='nav-link hover:bg-blue-400' to='/viewitems' style={{ color: 'white' }}>View Items</NavLink>
                     </MDBNavbarItem>
+
                     {
                       role === "Donor" ? (
                         <>
@@ -129,6 +132,10 @@ console.log(user)
                     <MDBNavbarItem>
                       <NavLink className='nav-link hover:bg-blue-400' to='/maps' style={{ color: 'white' }}>📍Items Near Me</NavLink>
                     </MDBNavbarItem>
+
+                    <MDBNavbarItem>
+                      <NavLink className='nav-link hover:bg-blue-400 mr-6' to='/viewitems' style={{ color: 'white' }}>Cart</NavLink>
+                    </MDBNavbarItem>
                     
                   </>
                 ) : (
@@ -140,12 +147,15 @@ console.log(user)
               {currentUser && currentUser.uid ? (
                   <div className='profile_info_wrapper'>
                     <MDBNavbarItem>
-                      <HiOutlineUserCircle className='teacher_user-icon' onClick={toggleDropDown}/>
+                      <HiOutlineUserCircle className='teacher_user-icon mr-3' onClick={toggleDropDown}/>
                     </MDBNavbarItem>
                     {
                       isShowProfile &&
                       <div className='profile_info'>
                         <NavLink className='nav-link hover:bg-blue-400' to='/' style={{ color: 'white' }}>Hello, {currentUser.displayName} </NavLink>
+
+                        <NavLink className='nav-link hover:bg-blue-400' to='/change-password' style={{ color: 'white' }}> Change Password </NavLink>
+
                         <NavLink
                           onClick={async () => handleLogOut()}
                           className='nav-link hover:bg-blue-400'

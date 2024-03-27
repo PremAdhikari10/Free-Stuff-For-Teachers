@@ -9,6 +9,7 @@ import AddItems from './components/AddItems';
 import SignIn from './Login_SignUP/SignIn';
 import Registration from './Login_SignUP/Registration';
 import ForgotPassword from './Login_SignUP/ForgotPassword';
+import ChangePassword from './Login_SignUP/ChangePassword';
 import EditItems from './components/EditItems';
 import MyListings from './components/MyListings';
 import Navbar from './navbar/Navbar';
@@ -103,6 +104,7 @@ const App = () => {
 
                <Route path='/sign-in' exact element={<SignIn />} />
                <Route path='/forgot-password' exact element={<ForgotPassword />} />
+               <Route path='/change-password' exact element={<ChangePassword />} />
 
             </Routes>
 
