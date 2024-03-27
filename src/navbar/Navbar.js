@@ -103,7 +103,7 @@ console.log(user)
               <MDBNavbarItem >
                 <NavLink className='nav-link hover:bg-blue-400' to='/' style={{ color: 'white' }}>Home</NavLink>
               </MDBNavbarItem>
-
+   
               {
                 currentUser && currentUser.uid ? (
                   <>
