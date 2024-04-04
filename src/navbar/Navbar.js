@@ -130,7 +130,7 @@ export default function Navbar() {
                              
                             <span className='cart-count ml-6 text-xxs absolute position-flex top-0 -mt-2'>1</span>
                              <FaShoppingCart size={28}/>
-                            
+                             
                             </NavLink>
                           </MDBNavbarItem>
 
