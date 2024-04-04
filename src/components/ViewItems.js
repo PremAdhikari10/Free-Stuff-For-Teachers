@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { auth, db, storage } from '../firebase'
 import { collection, getDocs, getDoc, doc, deleteDoc } from 'firebase/firestore'
 import { toast } from "react-toastify";
+import { AddToCart } from './AddToCart';
 import {
   MDBContainer,
   MDBRow,
@@ -21,13 +22,14 @@ import { getStorage, ref, deleteObject } from 'firebase/storage';
 
 
 const ViewItems = () => {
+  const [itemValue, setItemValue] = useState("");
   const [items, setItems] = useState([]);
   const [currentUser, setCurrentUser] = useState("");
   const [itemCollection, setItemCollection] = useState([]);
   const [role, setRole] = useState();
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categories, setCategories] = useState([]);
-
+ 
   const navigate = useNavigate("/")
   
   useEffect(() => {
@@ -90,8 +92,22 @@ const ViewItems = () => {
     }
 
   }
-//get user item:
 
+  const test = async(item) => {
+    console.log(item)
+  }
+//get user item:
+const getStock = async(item)=> {
+  if (parseInt(item.quantity) === 1) {
+   setItemValue("Nearly Out of Stock")
+  }
+  else if (parseInt(item.quantity === 0)) {
+    setItemValue ("Out of Stock")
+  }
+  else {
+    setItemValue("")
+  }
+}
 
   //delete items
 
@@ -124,7 +140,7 @@ const ViewItems = () => {
       navigate('/');
     }
   };
-
+ 
   return (
     <div>
       <h4 className="mt-4 mb-5 text-center">
@@ -209,6 +225,8 @@ const ViewItems = () => {
                           <span className="text-danger">
                             Quantity: {item.quantity}
                           </span>
+                          <p>{()=>getStock(item)}</p>
+                          <p>{itemValue}</p>
                         </div>
                         <h6 className="text-success">Free Items</h6>
                         <div className="d-flex flex-column mt-4">
@@ -235,16 +253,17 @@ const ViewItems = () => {
                                 Edit Item
                               </MDBBtn>
                             </>
-                          ) : (
+                          )  : role === 'Teacher'?(
                             <MDBBtn
                               outline
                               color="primary"
                               size="sm"
                               className="mt-2"
+                              onClick={()=>AddToCart(item)}
                             >
-                              Add to Cart
+                             Add to Cart
                             </MDBBtn>
-                          )}
+                          ):null}
                         </div>
                       </MDBCol>
                     </MDBRow>

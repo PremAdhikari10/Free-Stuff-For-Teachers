@@ -12,6 +12,7 @@ import ForgotPassword from './Login_SignUP/ForgotPassword';
 import ChangePassword from './Login_SignUP/ChangePassword';
 import EditItems from './components/EditItems';
 import MyListings from './components/MyListings';
+import Carts from './components/Carts';
 import Navbar from './navbar/Navbar';
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -77,16 +78,19 @@ const App = () => {
                               <Route path='/add_items' exact element={<AddItems />} />
                               <Route path='/edit-items/:databaseName' exact element={<EditItems />} />
                               <Route path='/my_listings' exact element={<MyListings />} />
+                              <Route path='/carts' exact element={<Unauthorized />} />
                            </>
                         ) : (
                            <>
                             <Route path='/add_items' exact element={<Unauthorized />} />
                             <Route path='/edit-items/:databaseName' exact element={<Unauthorized/>} />
                             <Route path='/my_listings' exact element={<Unauthorized />} />
+                            <Route path='/carts' exact element={<Carts />} />
                            </>
                         )
                      }
                      <Route path='/maps' exact element={<ItemsNearMe />} />
+                     
                   </>
                ) : (
                   <>
@@ -95,6 +99,7 @@ const App = () => {
                      <Route path='/maps' exact element={<SignIn />} />
                      <Route path="/edit-items/:databaseName" exact element={<SignIn />}/>
                      <Route path='/my_listings' exact element={<SignIn />} />
+                     <Route path='/carts' exact element={<SignIn />} />
                   </>
                )}
 

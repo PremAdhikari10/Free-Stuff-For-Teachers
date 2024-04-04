@@ -17,6 +17,7 @@ import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import "../navbar/Navbar.css";
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import logo from "../assets/logo.png";
+import { FaShoppingCart } from "react-icons/fa";
 
 export default function Navbar() {
   const navigate = useNavigate()
@@ -28,8 +29,6 @@ export default function Navbar() {
       if (user) {
         // User is signed in.
         setCurrentUser(user);
-        
-console.log(user)
 
       } else {
         // User is signed out.
@@ -58,7 +57,7 @@ console.log(user)
     const docRef = doc(db, "users", currentUser.uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-   //   console.log("Document data:", docSnap.data().role);
+      //   console.log("Document data:", docSnap.data().role);
       setRole(docSnap.data().role)
 
     } else {
@@ -85,7 +84,7 @@ console.log(user)
         <MDBContainer fluid>
           <MDBNavbarBrand>
             <NavLink to='/'>
-              <img src={logo} alt='logo' className='logo'/>
+              <img src={logo} alt='logo' className='logo' />
             </NavLink>
           </MDBNavbarBrand>
           <MDBNavbarToggler
@@ -98,12 +97,12 @@ console.log(user)
           >
             <MDBIcon icon='bars' fas />
           </MDBNavbarToggler>
-          <MDBCollapse open={openNavColor} navbar style={{height: "auto"}}>
+          <MDBCollapse open={openNavColor} navbar style={{ height: "auto" }}>
             <MDBNavbarNav className='justify-content-end mb-2 mb-lg-0 '>
               <MDBNavbarItem >
                 <NavLink className='nav-link hover:bg-blue-400' to='/' style={{ color: 'white' }}>Home</NavLink>
               </MDBNavbarItem>
-   
+
               {
                 currentUser && currentUser.uid ? (
                   <>
@@ -111,7 +110,9 @@ console.log(user)
                     <MDBNavbarItem>
                       <NavLink className='nav-link hover:bg-blue-400' to='/viewitems' style={{ color: 'white' }}>View Items</NavLink>
                     </MDBNavbarItem>
-
+                    <MDBNavbarItem>
+                      <NavLink className='nav-link hover:bg-blue-400' to='/maps' style={{ color: 'white' }}>📍Items Near Me</NavLink>
+                    </MDBNavbarItem>
                     {
                       role === "Donor" ? (
                         <>
@@ -124,55 +125,56 @@ console.log(user)
                         </>
                       ) : (
                         <>
+                          <MDBNavbarItem>
+                            <NavLink className='nav-link hover:bg-blue-400 mr-6' to='/carts' style={{ color: 'white' }}>
+                             <FaShoppingCart />
+                             <span className='cart-count'>1</span>
+                            
+                            </NavLink>
+                          </MDBNavbarItem>
 
                         </>
                       )
                     }
 
-                    <MDBNavbarItem>
-                      <NavLink className='nav-link hover:bg-blue-400' to='/maps' style={{ color: 'white' }}>📍Items Near Me</NavLink>
-                    </MDBNavbarItem>
-
-                    <MDBNavbarItem>
-                      <NavLink className='nav-link hover:bg-blue-400 mr-6' to='/viewitems' style={{ color: 'white' }}>Cart</NavLink>
-                    </MDBNavbarItem>
                     
                   </>
                 ) : (
                   <>
+
                   </>
                 )
               }
 
               {currentUser && currentUser.uid ? (
-                  <div className='profile_info_wrapper'>
-                    <MDBNavbarItem>
-                      <HiOutlineUserCircle className='teacher_user-icon mr-3' onClick={toggleDropDown}/>
-                    </MDBNavbarItem>
-                    {
-                      isShowProfile &&
-                      <div className='profile_info'>
-                        <NavLink className='nav-link hover:bg-blue-400' to='/' style={{ color: 'white' }}>Hello, {currentUser.displayName} </NavLink>
+                <div className='profile_info_wrapper'>
+                  <MDBNavbarItem>
+                    <HiOutlineUserCircle className='teacher_user-icon mr-3' onClick={toggleDropDown} />
+                  </MDBNavbarItem>
+                  {
+                    isShowProfile &&
+                    <div className='profile_info'>
+                      <NavLink className='nav-link hover:bg-blue-400' to='/' style={{ color: 'white' }}>Hello, {currentUser.displayName} </NavLink>
 
-                        <NavLink className='nav-link hover:bg-blue-400' to='/change-password' style={{ color: 'white' }}> Change Password </NavLink>
+                      <NavLink className='nav-link hover:bg-blue-400' to='/change-password' style={{ color: 'white' }}> Change Password </NavLink>
 
-                        <NavLink
-                          onClick={async () => handleLogOut()}
-                          className='nav-link hover:bg-blue-400'
-                          to='/sign-in'
-                          style={{ color: 'white' }}
-                        >
+                      <NavLink
+                        onClick={async () => handleLogOut()}
+                        className='nav-link hover:bg-blue-400'
+                        to='/sign-in'
+                        style={{ color: 'white' }}
+                      >
                         Sign Out
-                        </NavLink>
-                      </div>
-                    }
-                  </div>
-                ) : (
-                  <>
-                    <NavLink className='nav-link hover:bg-blue-400' to='/registration' style={{ color: 'white' }}>Register</NavLink>
-                    <NavLink className='nav-link hover:bg-blue-400' to='/sign-in' style={{ color: 'white' }}>Sign in </NavLink>
-                  </>
-                )
+                      </NavLink>
+                    </div>
+                  }
+                </div>
+              ) : (
+                <>
+                  <NavLink className='nav-link hover:bg-blue-400' to='/registration' style={{ color: 'white' }}>Register</NavLink>
+                  <NavLink className='nav-link hover:bg-blue-400' to='/sign-in' style={{ color: 'white' }}>Sign in </NavLink>
+                </>
+              )
               }
 
             </MDBNavbarNav>
@@ -181,9 +183,9 @@ console.log(user)
       </MDBNavbar>
 
       {
-        isShowProfile && 
-        <div className='screen_wrapper' onClick={toggleDropDown}/>
+        isShowProfile &&
+        <div className='screen_wrapper' onClick={toggleDropDown} />
       }
     </div>
   );
-    }
+}
