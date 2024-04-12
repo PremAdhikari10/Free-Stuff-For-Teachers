@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase'
-import { collection, getDocs, deleteDoc, doc } from 'firebase/firestore'
+import { collection, getDocs, deleteDoc, doc, getDoc,onSnapshot } from 'firebase/firestore' 
 import { toast } from "react-toastify";
 import { useState } from 'react';
+import { AddToCart, removeCart } from './AddToCart';
 import './Carts.css'
 import {
     MDBBtn,
@@ -18,38 +19,42 @@ import {
     MDBTypography,
     MDBCardText
 } from "mdb-react-ui-kit";
+import { updateDoc } from 'firebase/firestore/lite';
 const Carts = () => {
 
-    const navigate = useNavigate("/")
-    const [cartCollection, setcartCollection] = useState([])
-    const [noItemsLeft, setNoItemsLeft] = useState(false);
+    const navigate = useNavigate();
+    const [cartCollection, setCartCollection] = useState([]);
 
     useEffect(() => {
         fetchCartItems();
+    }, []);
 
-
-    }, [])
-
-
+    useEffect(() => {
+        // Subscribe to cart changes
+        const unsubscribe = subscribeToCartChanges();
+        return () => unsubscribe();
+    }, []);
 
     const fetchCartItems = async () => {
-
         try {
-            const userEmail = await auth.currentUser.email;
+            const userEmail = auth.currentUser.email;
             const querySnapshot = await getDocs(collection(db, userEmail));
-
-            const cartItems = [];
-
-            querySnapshot.forEach((doc) => {
-                cartItems.push(doc.data());
-            });
-            setcartCollection(cartItems)
+            const cartItems = querySnapshot.docs.map(doc => doc.data());
+            setCartCollection(cartItems);
         } catch (error) {
-            toast.error("Error fetching user data:", error);
-            navigate('/')
+            toast.error('Error fetching user data:', error);
+            navigate('/');
         }
+    };
 
-    }
+    const subscribeToCartChanges = () => {
+        const userEmail = auth.currentUser.email;
+        return onSnapshot(collection(db, userEmail), (snapshot) => {
+            const updatedCartItems = snapshot.docs.map(doc => doc.data());
+            setCartCollection(updatedCartItems);
+        });
+    };
+
     const deleteCartItem = async (item) => {
         const userEmail = await auth.currentUser.email;
         if (window.confirm("Are you sure you want to delete item from the cart?")) {
@@ -59,7 +64,7 @@ const Carts = () => {
 
 
                 // After deletion, update the UI to reflect the changes
-                setcartCollection(prevItems => prevItems.filter(cartItems => cartItems.itemName !== item));
+                setCartCollection(prevItems => prevItems.filter(cartItems => cartItems.itemName !== item));
                 toast.success("Item removed from cart!!");
                 if (cartCollection.length === 0) {
 
@@ -68,16 +73,25 @@ const Carts = () => {
                 toast.error("Error deleting item:", error);
             }
         }
-    }
+    };
 
-    const getTotalQuantity = () => {
-        let totalQuantity = 0;
-        cartCollection.forEach((item) => {
-            totalQuantity += item.quantity;
-        })
-        return totalQuantity;
-    }
+    const handleAddtoCart = async (item) => {
+        try {
+            await AddToCart(item);
+          
+        } catch (error) {
+            toast.error('Error adding item to cart:', error);
+        }
+    };
 
+    const handleRemoveCart = async (item) => {
+        try {
+            await removeCart(item);
+        
+        } catch (error) {
+            toast.error('Error removing item from cart:', error);
+        }
+    };
 
     return (
         <>
@@ -113,14 +127,14 @@ const Carts = () => {
                                             </MDBCol>
                                             <MDBCol md="3" lg="3" xl="2"
                                                 className="d-flex align-items-center justify-content-around">
-                                                <MDBBtn color="link" className="px-2">
-                                                    <MDBIcon fas icon="minus" />
+                                                <MDBBtn color="primary" className="px-2" onClick={()=>handleRemoveCart(item)}>
+                                                    <MDBIcon fas icon="minus"/>
                                                 </MDBBtn>
 
-                                                <MDBInput min={0} defaultValue={1} type="number" size="sm" />
+                                                <span size="sm">{item.quantity} </span>
 
-                                                <MDBBtn color="link" className="px-2">
-                                                    <MDBIcon fas icon="plus" />
+                                                <MDBBtn color="primary" className="px-2" onClick={()=>handleAddtoCart(item)}>
+                                                <MDBIcon fas icon="plus"/>
                                                 </MDBBtn>
                                             </MDBCol>
                                             <MDBCol md="3" lg="2" xl="2" className="offset-lg-1">
@@ -128,11 +142,11 @@ const Carts = () => {
                                                     <span className="text-muted">Qty: </span>{item.quantity}
                                                 </MDBTypography>
                                             </MDBCol>
-                                            <MDBCol md="1" lg="1" xl="1" className="text-end" onClick={() => deleteCartItem(item.itemName)}>
+                                            {/* <MDBCol md="1" lg="1" xl="1" className="text-end" onClick={() => deleteCartItem(item.itemName)}>
                                                 <a href="#!" className="text-danger">
                                                     <MDBIcon fas icon="trash text-danger" size="lg" />
                                                 </a>
-                                            </MDBCol>
+                                            </MDBCol> */}
                                         </MDBRow>
                                     </MDBCardBody>
                                 </MDBCard>))}

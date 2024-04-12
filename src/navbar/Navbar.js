@@ -13,15 +13,17 @@ import {
   MDBNavbarBrand,
   MDBCollapse
 } from 'mdb-react-ui-kit';
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import { collection, doc, getDoc, onSnapshot } from 'firebase/firestore';
 import "../navbar/Navbar.css";
 import { HiOutlineUserCircle } from "react-icons/hi2";
 import logo from "../assets/logo.png";
 import { FaShoppingCart } from "react-icons/fa";
+import { get } from 'firebase/database';
 
 export default function Navbar() {
   const navigate = useNavigate()
   const [currentUser, setCurrentUser] = useState("")
+  const [cart, setCart] = useState(0)
   const [isShowProfile, setIsShowProfile] = useState(false);
   const [role, setRole] = useState()
   useEffect(() => {
@@ -52,7 +54,15 @@ export default function Navbar() {
         toast.error("There is an error logging out.");
       });
   };
+  useEffect(() => {
+    if (currentUser && currentUser.uid) {
+      const unsubscribeCartUpdates =getQuantity();
+      getRole();
+      return ()=>unsubscribeCartUpdates();
+    }
+  }, [currentUser])
 
+ 
   const getRole = async () => {
     const docRef = doc(db, "users", currentUser.uid);
     const docSnap = await getDoc(docRef);
@@ -66,12 +76,19 @@ export default function Navbar() {
     }
 
   }
+  const getQuantity = () => {
+    const cartName = 'cart' + currentUser.email;
+    const cartRef = doc(db, cartName, "cartQuantity");
+    return onSnapshot(cartRef, (docSnapshot) => {
+      if (docSnapshot.exists()) {
+        setCart(docSnapshot.data().cartQuantity);
+      } else {
+        setCart(0); // Set to default value if document doesn't exist
+      }
+    });
+  }
 
-  useEffect(() => {
-    if (currentUser && currentUser.uid) {
-      getRole()
-    }
-  }, [currentUser])
+
 
 
   const toggleDropDown = () => {
@@ -127,9 +144,12 @@ export default function Navbar() {
                         <>
                           <MDBNavbarItem>
                             <NavLink className='nav-link hover:bg-blue-400 mr-6' to='/carts' style={{ color: 'white' }}>
-                             <FaShoppingCart />
-                             <span className='cart-count'>1</span>
-                            
+                              <FaShoppingCart />
+                              <span className='cart-count'>
+
+                                {cart}
+                              </span>
+
                             </NavLink>
                           </MDBNavbarItem>
 
@@ -137,7 +157,7 @@ export default function Navbar() {
                       )
                     }
 
-                    
+
                   </>
                 ) : (
                   <>
