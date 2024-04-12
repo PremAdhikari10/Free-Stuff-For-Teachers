@@ -105,6 +105,7 @@ export const removeCart = async (item) => {
             await updateDoc(docRef, {
                 quantity: item.quantity - 1
             });
+            toast.success("Item Removed from Cart");
         }
 
         if(item.quantity>0){ 
@@ -127,7 +128,7 @@ export const removeCart = async (item) => {
             });
         }
 
-        toast.success("Item Removed from Cart");
+       
     }
 
 }

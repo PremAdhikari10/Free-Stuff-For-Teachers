@@ -115,9 +115,9 @@ export default function Navbar() {
             <MDBIcon icon='bars' fas />
           </MDBNavbarToggler>
           <MDBCollapse open={openNavColor} navbar style={{ height: "auto" }}>
-            <MDBNavbarNav className='justify-content-end mb-2 mb-lg-0 '>
+            <MDBNavbarNav className='justify-content-end mb-2 mb-lg-0'>
               <MDBNavbarItem >
-                <NavLink className='nav-link hover:bg-blue-400' to='/' style={{ color: 'white' }}>Home</NavLink>
+                <NavLink className='nav-link hover:bg-blue-400 mr-2' to='/' style={{ color: 'white' }}>Home</NavLink>
               </MDBNavbarItem>
 
               {
@@ -125,10 +125,10 @@ export default function Navbar() {
                   <>
 
                     <MDBNavbarItem>
-                      <NavLink className='nav-link hover:bg-blue-400' to='/viewitems' style={{ color: 'white' }}>View Items</NavLink>
+                      <NavLink className='nav-link hover:bg-blue-400 mr-2' to='/viewitems' style={{ color: 'white' }}>View Items</NavLink>
                     </MDBNavbarItem>
                     <MDBNavbarItem>
-                      <NavLink className='nav-link hover:bg-blue-400' to='/maps' style={{ color: 'white' }}>📍Items Near Me</NavLink>
+                      <NavLink className='nav-link hover:bg-blue-400 mr-8' to='/maps' style={{ color: 'white' }}>📍Items Near Me</NavLink>
                     </MDBNavbarItem>
                     {
                       role === "Donor" ? (
