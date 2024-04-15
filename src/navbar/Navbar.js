@@ -56,13 +56,13 @@ export default function Navbar() {
   };
   useEffect(() => {
     if (currentUser && currentUser.uid) {
-      const unsubscribeCartUpdates =getQuantity();
+      const unsubscribeCartUpdates = getQuantity();
       getRole();
-      return ()=>unsubscribeCartUpdates();
+      return () => unsubscribeCartUpdates();
     }
   }, [currentUser])
 
- 
+
   const getRole = async () => {
     const docRef = doc(db, "users", currentUser.uid);
     const docSnap = await getDoc(docRef);
@@ -143,12 +143,13 @@ export default function Navbar() {
                       ) : (
                         <>
                           <MDBNavbarItem>
-                            <NavLink className='nav-link hover:bg-blue-400 mr-6' to='/carts' style={{ color: 'white' }}>
-                              <FaShoppingCart />
+                            <NavLink className='nav-link hover:bg-blue-400 mr-8' to='/carts' style={{ color: 'white', position: 'relative' }}>
                               <span className='cart-count'>
 
                                 {cart}
                               </span>
+                              <FaShoppingCart />
+
 
                             </NavLink>
                           </MDBNavbarItem>
@@ -197,7 +198,7 @@ export default function Navbar() {
               )
               }
 
-            
+
 
             </MDBNavbarNav>
           </MDBCollapse>
