@@ -29,7 +29,7 @@ export const AddToCart = async (item) => {
             const cartName = 'cart' + userEmail;
 
             await setDoc(doc(db, cartName, "cartQuantity"), {
-                cartQuantity:0
+                cartQuantity:1
             })
         }
 
