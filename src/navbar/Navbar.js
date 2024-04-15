@@ -144,13 +144,10 @@ export default function Navbar() {
                         <>
                           <MDBNavbarItem>
                             <NavLink className='nav-link hover:bg-blue-400 mr-8' to='/carts' style={{ color: 'white', position: 'relative' }}>
-                              <span className='cart-count'>
-
+                              <span className='cart-count  ml-6 text-xxs absolute position-flex top-0 -mt-2'>
                                 {cart}
                               </span>
-                              <FaShoppingCart />
-
-
+                              <FaShoppingCart size={28} />
                             </NavLink>
                           </MDBNavbarItem>
 
