@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase'
-import { collection, getDocs, deleteDoc, doc, getDoc,onSnapshot } from 'firebase/firestore' 
+import { collection, getDocs, deleteDoc, doc, getDoc, onSnapshot } from 'firebase/firestore'
 import { toast } from "react-toastify";
 import { useState } from 'react';
 import { AddToCart, removeCart } from './AddToCart';
@@ -49,10 +49,18 @@ const Carts = () => {
 
     const subscribeToCartChanges = () => {
         const userEmail = auth.currentUser.email;
-        return onSnapshot(collection(db, userEmail), (snapshot) => {
-            const updatedCartItems = snapshot.docs.map(doc => doc.data());
-            setCartCollection(updatedCartItems);
+
+    const unsubscribe = onSnapshot(collection(db, userEmail), (snapshot) => {
+        const updatedCartItems = snapshot.docs.map(doc => {
+            const cartItem = doc.data();
+            // Update quantity in real-time
+            cartItem.quantity = doc.data().quantity; // Ensure to replace 'quantity' with the correct field name
+            return cartItem;
         });
+        setCartCollection(updatedCartItems);
+    });
+
+    return unsubscribe;
     };
 
     const deleteCartItem = async (item) => {
@@ -78,7 +86,7 @@ const Carts = () => {
     const handleAddtoCart = async (item) => {
         try {
             await AddToCart(item);
-          
+
         } catch (error) {
             toast.error('Error adding item to cart:', error);
         }
@@ -87,7 +95,7 @@ const Carts = () => {
     const handleRemoveCart = async (item) => {
         try {
             await removeCart(item);
-        
+
         } catch (error) {
             toast.error('Error removing item from cart:', error);
         }
@@ -127,14 +135,14 @@ const Carts = () => {
                                             </MDBCol>
                                             <MDBCol md="3" lg="3" xl="2"
                                                 className="d-flex align-items-center justify-content-around">
-                                                <MDBBtn color="primary" className="px-2" onClick={()=>handleRemoveCart(item)}>
-                                                    <MDBIcon fas icon="minus"/>
+                                                <MDBBtn color="primary" className="px-2" onClick={() => handleRemoveCart(item)}>
+                                                    <MDBIcon fas icon="minus" />
                                                 </MDBBtn>
 
                                                 <span size="sm">{item.quantity} </span>
 
-                                                <MDBBtn color="primary" className="px-2" onClick={()=>handleAddtoCart(item)}>
-                                                <MDBIcon fas icon="plus"/>
+                                                <MDBBtn color="primary" className="px-2" onClick={() => handleAddtoCart(item)}>
+                                                    <MDBIcon fas icon="plus" />
                                                 </MDBBtn>
                                             </MDBCol>
                                             <MDBCol md="3" lg="2" xl="2" className="offset-lg-1">

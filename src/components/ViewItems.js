@@ -306,10 +306,3 @@ const ViewItems = () => {
   )
 }
 export default ViewItems;
-
-
-
-
-
-
-
