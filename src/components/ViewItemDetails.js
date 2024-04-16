@@ -19,32 +19,7 @@ const ViewItemDetails = () => {
   const [role, setRole] = useState(null); 
   const [currentUser, setCurrentUser] = useState("");
 
-  useEffect(() => {
-    const fetchItem = async () => {
-      try {
-        const docRef = doc(db, 'items', databaseName);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const itemData = docSnap.data();
-          setItem(itemData);
   
-          // Convert address to latitude and longitude
-          fetchCoordinates(itemData.address);
-        } else {
-          console.log('No such document!');
-          toast.error('Item not found!');
-          navigate('/'); // Redirect to home page if item not found
-        }
-      } catch (error) {
-        console.error('Error fetching item:', error);
-        toast.error('Error fetching item details. Please try again later.');
-        navigate('/'); // Redirect to home page if error occurs
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchItem();
-  }, [databaseName, navigate]);
 
   useEffect(() => {
     // Firebase Auth listener
@@ -86,27 +61,7 @@ const ViewItemDetails = () => {
   }
 
 
-  const fetchCoordinates = async (address) => {
-    try {
-      const apiKey = 'AIzaSyCp_fMxR0fekTGZ5ybRbP2GHftPu_cbhAI';
-      const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
-      const response = await fetch(apiUrl);
-      if (!response.ok) {
-        throw new Error('Failed to fetch coordinates');
-      }
-      const data = await response.json();
-      if (data.status === 'OK' && data.results.length > 0) {
-        const { lat, lng } = data.results[0].geometry.location;
-        setLatLng({ lat, lng });
-        console.log('Fetched latitude:', lat);
-        console.log('Fetched longitude:', lng);
-      } else {
-        throw new Error('No results found');
-      }
-    } catch (error) {
-      console.error('Error fetching coordinates:', error);
-    }
-  };
+
 
   const handleGoBack = () => {
     navigate('/viewitems');
