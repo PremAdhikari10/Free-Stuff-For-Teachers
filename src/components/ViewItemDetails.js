@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
 import { doc, getDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
@@ -7,19 +7,37 @@ import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBCardImage, MDBCa
 import "./ViewItems.css";
 import { auth } from '../firebase'; // Assuming you've set up your Firebase configuration in a file named 'firebase.js' in the '../firebase' directory
 
-// Initialize Firebase authentication
-
-
 const ViewItemDetails = () => {
   const { databaseName } = useParams();
   const navigate = useNavigate();
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [latLng, setLatLng] = useState(null); // State to hold latitude and longitude
   const [role, setRole] = useState(null); 
   const [currentUser, setCurrentUser] = useState("");
 
-  
+  useEffect(() => {
+    const fetchItem = async () => {
+      try {
+        const docRef = doc(db, 'items', databaseName);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const itemData = docSnap.data();
+          setItem(itemData);
+        } else {
+          console.log('No such document!');
+          toast.error('Item not found!');
+          navigate('/'); // Redirect to home page if item not found
+        }
+      } catch (error) {
+        console.error('Error fetching item:', error);
+        toast.error('Error fetching item details. Please try again later.');
+        navigate('/'); // Redirect to home page if error occurs
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchItem();
+  }, [databaseName, navigate]);
 
   useEffect(() => {
     // Firebase Auth listener
@@ -27,7 +45,6 @@ const ViewItemDetails = () => {
       if (user) {
         // User is signed in.
         setCurrentUser(user);
-        // Fetch data when component mounts
       } else {
         // User is signed out.
         setCurrentUser(null);
@@ -44,24 +61,15 @@ const ViewItemDetails = () => {
     }
   }, [currentUser]);
 
-
-
   const getRole = async () => {
     const docRef = doc(db, "users", currentUser.uid);
     const docSnap = await getDoc(docRef);
     if (docSnap.exists()) {
-      // console.log("Document data:", docSnap.data().role);
-      setRole(docSnap.data().role)
-
+      setRole(docSnap.data().role);
     } else {
-      // docSnap.data() will be undefined in this case
       console.log("No such document!");
     }
-
   }
-
-
-
 
   const handleGoBack = () => {
     navigate('/viewitems');
@@ -103,32 +111,14 @@ const ViewItemDetails = () => {
                 <div>
                   <p>Category: {item.category}</p>
                   <p>Donor Name: {item.donorName}</p>
-                  <p>
-                    Address:{" "}
-                    <a
-                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      style={{ textDecoration: 'underline' }}
-                    >
-                      {item.address}
-                    </a>
-                  </p>
+                  <p>Address: {item.address}</p>
                   <p>Phone Number: {item.phoneNumber}</p>
                   <p>Description: {item.description}</p>
                   {/* Add more item details here */}
                 </div>
-               {role=="Teacher"?(
-               <>
-                <MDBBtn onClick={handleAddToCart} outline color="primary" size="sm" className="add-to-cart-button">Add to Cart</MDBBtn>
-               
-               </>
-              ):
-               (<>
-                
-                 </>)}
-
-                
+                {role === "Teacher" && (
+                  <MDBBtn onClick={handleAddToCart} outline color="primary" size="sm" className="add-to-cart-button">Add to Cart</MDBBtn>
+                )}
               </MDBCardBody>
             </MDBCard>
           </MDBCol>
