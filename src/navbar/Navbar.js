@@ -111,16 +111,16 @@ export default function Navbar() {
                       <NavLink className='nav-link hover:bg-blue-400 mr-2' to='/viewitems' style={{ color: 'white' }}>View Items</NavLink>
                     </MDBNavbarItem>
                     <MDBNavbarItem>
-                      <NavLink className='nav-link hover:bg-blue-400 mr-8' to='/maps' style={{ color: 'white' }}>📍Items Near Me</NavLink>
+                      <NavLink className='nav-link hover:bg-blue-400 mr-4' to='/maps' style={{ color: 'white' }}>📍Items Near Me</NavLink>
                     </MDBNavbarItem>
                     {
                       role === "Donor" ? (
                         <>
                           <MDBNavbarItem>
-                            <NavLink className='nav-link hover:bg-blue-400' to='/add_items' style={{ color: 'white' }}>Add Items</NavLink>
+                            <NavLink className='nav-link hover:bg-blue-400 mr-2' to='/add_items' style={{ color: 'white' }}>Add Items</NavLink>
                           </MDBNavbarItem>
                           <MDBNavbarItem>
-                            <NavLink className='nav-link hover:bg-blue-400' to='/my_listings' style={{ color: 'white' }}>My Listings</NavLink>
+                            <NavLink className='nav-link hover:bg-blue-400 mr-2' to='/my_listings' style={{ color: 'white' }}>My Listings</NavLink>
                           </MDBNavbarItem>
                         </>
                       ) : (
