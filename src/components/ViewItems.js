@@ -20,6 +20,7 @@ import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 
 
+
 const ViewItems = () => {
   const [items, setItems] = useState([]);
   const [currentUser, setCurrentUser] = useState("");
@@ -114,6 +115,9 @@ const ViewItems = () => {
   function onEdit(databaseName) {
     navigate(`/edit-items/${databaseName}`);
   }
+  function ViewDetails(databaseName){
+    navigate (`/view-details/${databaseName}`)
+  }
   const fetchCategories = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'categories'));
@@ -163,6 +167,7 @@ const ViewItems = () => {
                           rippleTag="div"
                           className="bg-image rounded hover-zoom hover-overlay"
                         >
+                          <Link to={`/view-details/${item.databaseName}`}>
                           <MDBCardImage
                             src={item.imageURL}
                             fluid
@@ -174,6 +179,7 @@ const ViewItems = () => {
                               style={{ backgroundColor: 'rgba(251, 251, 251, 0.15)' }}
                             ></div>
                           </a>
+                          </Link>
                         </MDBRipple>
                       </MDBCol>
                       <MDBCol md="6">
@@ -212,7 +218,7 @@ const ViewItems = () => {
                         </div>
                         <h6 className="text-success">Free Items</h6>
                         <div className="d-flex flex-column mt-4">
-                          <MDBBtn color="primary" size="sm">
+                          <MDBBtn color="primary" size="sm" onClick={()=>ViewDetails(item.databaseName)}>
                             View Details
                           </MDBBtn>
                           {currentUser && currentUser.uid === item.userRef ? (
