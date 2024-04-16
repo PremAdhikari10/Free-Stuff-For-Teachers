@@ -8,20 +8,20 @@ import 'leaflet.markercluster/dist/MarkerCluster.css';
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
 //npm install leaflet.markercluster
 import 'leaflet.markercluster';
-
+import { useLocation } from 'react-router-dom';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 
 function ItemsNearMe() {
+  const currentLocation = useLocation();
   const [userLocation, setUserLocation] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const [map, setMap] = useState(null);
+  const [map, setMap] = useState(null); 
   const [itemsNearMe, setItemsNearMe] = useState([]);
-  const markerClusterGroup = useRef(null);
-
+  const markerClusterGroup = useRef(null); 
   useEffect(() => {
-    if (!navigator.geolocation || !L) return;
+    if (!navigator.geolocation ) return;
 
     navigator.geolocation.getCurrentPosition(
       position => {
@@ -34,7 +34,7 @@ function ItemsNearMe() {
         console.error('Error getting user location:', error);
       }
     );
-  }, []);
+  }, [currentLocation]);
 
   const mapRef = useRef(null);
 
@@ -44,7 +44,12 @@ function ItemsNearMe() {
         const querySnapshot = await getDocs(collection(db, 'items'));
         const items = [];
         querySnapshot.forEach(doc => {
-          items.push(doc.data());
+          // Get the document ID (databaseName)
+          const databaseName = doc.id;
+          // Get other item details
+          const { address, itemName, imageURL } = doc.data();
+          // Push item details along with databaseName
+          items.push({ databaseName, address, itemName, imageURL });
         });
         setItemsNearMe(items);
       } catch (error) {
@@ -86,14 +91,14 @@ function ItemsNearMe() {
     if (!map) return;
 
     itemsNearMe.forEach(item => {
-      const { address, itemName, imageURL } = item;
+      const { address, itemName, imageURL, databaseName } = item;
       if (address) {
-        fetchLocationAndAddMarker(address, itemName, imageURL);
+        fetchLocationAndAddMarker(address, itemName, imageURL, databaseName);
       }
     });
   }, [map, itemsNearMe]);
 
-  const fetchLocationAndAddMarker = async (address, itemName, imageURL) => {
+  const fetchLocationAndAddMarker = async (address, itemName, imageURL, databaseName) => {
     try {
       const response = await fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(address)}&key=b4308f04963a43c69e7ff49ffa81ec64&countrycode=us`);
       const data = await response.json();
@@ -105,7 +110,7 @@ function ItemsNearMe() {
           iconSize: [50, 50],
           iconAnchor: [25, 50]
         });
-        const marker = L.marker([lat, lng], { icon }).bindPopup(itemName);
+        const marker = L.marker([lat, lng], { icon }).bindPopup(`<a href="/view-details/${databaseName}">${itemName}</a>`);
         markerClusterGroup.current.addLayer(marker); // Add marker to the cluster group
       } else {
         console.error('Location not found for address:', address);
@@ -114,6 +119,7 @@ function ItemsNearMe() {
       console.error('Error fetching location for address:', address, error);
     }
   };
+  
 
   const handleSearch = () => {
     fetch(`https://api.opencagedata.com/geocode/v1/json?q=${encodeURIComponent(searchQuery)}&key=b4308f04963a43c69e7ff49ffa81ec64&countrycode=us`)
@@ -192,8 +198,6 @@ function ItemsNearMe() {
       </div>
     </div>
   );
-  
 }
 
 export default ItemsNearMe;
-
