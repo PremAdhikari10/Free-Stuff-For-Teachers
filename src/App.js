@@ -12,6 +12,7 @@ import ForgotPassword from './Login_SignUP/ForgotPassword';
 import ChangePassword from './Login_SignUP/ChangePassword';
 import EditItems from './components/EditItems';
 import MyListings from './components/MyListings';
+import Carts from './components/Carts';
 import Navbar from './navbar/Navbar';
 import { ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
@@ -77,6 +78,7 @@ const App = () => {
                   <Route path='/add_items' exact element={<AddItems />} />
                   <Route path='/edit-items/:databaseName' exact element={<EditItems />} />
                   <Route path='/my_listings' exact element={<MyListings />} />
+                  <Route path='/carts' exact element={<Unauthorized />} />
                   <Route path='/view-details/:databaseName' exact element={<ViewItemDetails />} /> {/* Step 2: Add route for viewing item details */}
                 </>
               ) : (
@@ -84,22 +86,22 @@ const App = () => {
                   <Route path='/add_items' exact element={<Unauthorized />} />
                   <Route path='/edit-items/:databaseName' exact element={<Unauthorized/>} />
                   <Route path='/my_listings' exact element={<Unauthorized />} />
-                  <Route path='/view-details/:databaseName' exact element={<Unauthorized />} /> {/* Step 2: Add route for viewing item details */}
+                  <Route path='/carts' exact element={<Carts />} />
+                  <Route path='/view-details/:databaseName' exact element={<ViewItemDetails />} /> {/* Step 2: Add route for viewing item details */}
                 </>
               )
                      }
-              <Route path='/maps' exact element={<ItemsNearMe />} />
-            </>
-          ) : (
-            <>
-              <Route path='/viewitems' exact element={<SignIn />} />
-              <Route path='/add_items' exact element={<SignIn />} />
-              <Route path='/maps' exact element={<SignIn />} />
-              <Route path="/edit-items/:databaseName" exact element={<SignIn />}/>
-              <Route path='/my_listings' exact element={<SignIn />} />
-              <Route path='/view-details/:databaseName' exact element={<SignIn />} /> {/* Step 2: Add route for viewing item details */}
-            </>
-          )}
+                     <Route path='/maps' exact element={<ItemsNearMe />} />
+                  </>
+               ) : (
+                  <>
+                     <Route path='/viewitems' exact element={<SignIn />} />
+                     <Route path='/add_items' exact element={<SignIn />} />
+                     <Route path='/maps' exact element={<SignIn />} />
+                     <Route path="/edit-items/:databaseName" exact element={<SignIn />}/>
+                     <Route path='/my_listings' exact element={<SignIn />} />
+                  </>
+               )}
 
           
                <Route path='/' exact element={<Home />} />

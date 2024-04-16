@@ -79,16 +79,18 @@ export default function AddItems() {
   const handleEvent = async (e) => {
     setIsSpinner(true);
 
+    const phoneNumberRegex = /^[0-9]{10}$/;
+    if (!phoneNumberRegex.test(phoneNumber)) {
+      toast.error("Please enter a valid 10-digit phone number");
+      setIsSpinner(false);
+      return;
+    }
     if (itemName === "" || category === "" || donorName === "" || quantity === "" || address === "" || description === "" || phoneNumber === "") {
       toast.error("Please complete all the input fields");
       setIsSpinner(false);
       return;
     }
-    //  if(phoneNumber!==10){
-    //   toast.error("Please enter valid Phone Number");
-    //   setIsSpinner(false);
-    //   return;
-    // }
+   
     if (image === "") {
       toast.error("Upload an image");
       setIsSpinner(false);

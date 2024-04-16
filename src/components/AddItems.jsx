@@ -47,8 +47,14 @@ export default function AddItems() {
 
   const handleEvent = async (e) => {
     setIsSpinner(true)
+    
 
-
+    const phoneNumberRegex = /^[0-9]{10}$/;
+    if (!phoneNumberRegex.test(phoneNumber)) {
+      toast.error("Please enter a valid 10-digit phone number");
+      setIsSpinner(false);
+      return;
+    }
     console.log(itemName, category, quantity, address, description, phoneNumber, image)
 
     if (itemName === "" ||category==="" || donorName==="" || quantity===""|| address===""||description===""||phoneNumber==="") {
@@ -56,11 +62,7 @@ export default function AddItems() {
       setIsSpinner(false);
       return;
     }
-    // else if(phoneNumber!==10){
-    //   toast.error("Please enter valid Phone Number");
-    //   setIsSpinner(false);
-    //   return;
-    // }
+    
     else if (image === "") {
       toast.error("Upload an image");
       setIsSpinner(false);

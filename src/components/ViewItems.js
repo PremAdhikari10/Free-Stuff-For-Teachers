@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { auth, db, storage } from '../firebase'
 import { collection, getDocs, getDoc, doc, deleteDoc } from 'firebase/firestore'
 import { toast } from "react-toastify";
+import { AddToCart } from './AddToCart';
 import {
   MDBContainer,
   MDBRow,
@@ -22,15 +23,17 @@ import { getStorage, ref, deleteObject } from 'firebase/storage';
 
 
 const ViewItems = () => {
+  const [itemValue, setItemValue] = useState("");
   const [items, setItems] = useState([]);
   const [currentUser, setCurrentUser] = useState("");
   const [itemCollection, setItemCollection] = useState([]);
-  const [role, setRole] = useState();
+  const [role, setRole] = useState(); 
   const [selectedCategory, setSelectedCategory] = useState('');
+ 
   const [categories, setCategories] = useState([]);
-
+    const [updatedItemCollection, setUpdatedItemCollection] = useState([]);
   const navigate = useNavigate("/")
-  
+
   useEffect(() => {
     // Firebase Auth listener
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -74,6 +77,7 @@ const ViewItems = () => {
 
   }
 
+
   //all items:
   const getItems = async () => {
     try {
@@ -82,7 +86,7 @@ const ViewItems = () => {
       querySnapshot.forEach(doc => {
         allItems.push(doc.data());
       });
-     // console.log(allItems);
+      // console.log(allItems);
       // Check the data being fetched
       setItemCollection(allItems);
     } catch (error) {
@@ -91,11 +95,8 @@ const ViewItems = () => {
     }
 
   }
-//get user item:
-
 
   //delete items
-
   const deleteItem = async (databaseName) => {
     if (window.confirm("Are you sure you want to delete the item?")) {
       try {
@@ -128,7 +129,26 @@ const ViewItems = () => {
       navigate('/');
     }
   };
+  useEffect(() => {
+    // Fetch updated quantities after adding to cart
+    fetchUpdatedQuantities();
+  }, [updatedItemCollection]); // Run the effect when updatedItemCollection changes
 
+  const fetchUpdatedQuantities = async () => {
+    try {
+      const updatedItems = [];
+      for (const item of itemCollection) {
+        const docRef = doc(db, 'items', item.databaseName);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          updatedItems.push(docSnap.data());
+        }
+      }
+      setUpdatedItemCollection(updatedItems);
+    } catch (error) {
+      // toast.error("Error fetching updated quantities:", error);
+    }
+  };
   return (
     <div>
       <h4 className="mt-4 mb-5 text-center">
@@ -152,7 +172,7 @@ const ViewItems = () => {
         </select>
       </div>
 
-      {itemCollection
+      {updatedItemCollection
         .filter((item) => !selectedCategory || item.category === selectedCategory)
         .map((item, index) => (
           <MDBContainer fluid key={index}>
@@ -182,6 +202,7 @@ const ViewItems = () => {
                           </Link>
                         </MDBRipple>
                       </MDBCol>
+                     
                       <MDBCol md="6">
                         <h5>{item.itemName}</h5>
                         <div className="d-flex flex-row">
@@ -216,7 +237,33 @@ const ViewItems = () => {
                             Quantity: {item.quantity}
                           </span>
                         </div>
-                        <h6 className="text-success">Free Items</h6>
+                        <h6 className="text-success">
+                        {item.quantity <= 1 && item.quantity !=0 ? (
+                        <>
+                          <p>Almost out of Stock</p>
+                        </>
+                      ) : (
+                        <>
+                        
+                        </>
+                      )}
+                      {item.quantity === 0 ? (
+                        <>
+                          <p>Out of Stock</p>
+                        </>
+                      ) : (
+                        <>
+                        </>
+                      )}
+                      {item.quantity>1? (
+                        <>
+                          <p>Avaialable for free</p>
+                        </>
+                      ) : (
+                        <>
+                        </>
+                      )}
+                        </h6>
                         <div className="d-flex flex-column mt-4">
                           <MDBBtn color="primary" size="sm" onClick={()=>ViewDetails(item.databaseName)}>
                             View Details
@@ -236,21 +283,22 @@ const ViewItems = () => {
                                 color="primary"
                                 size="sm"
                                 className="mt-2"
-                                onClick={()=>onEdit(item.databaseName)}
+                                onClick={() => onEdit(item.databaseName)}
                               >
                                 Edit Item
                               </MDBBtn>
                             </>
-                          ) : (
+                          ) : role === 'Teacher' ? (
                             <MDBBtn
                               outline
                               color="primary"
                               size="sm"
                               className="mt-2"
+                              onClick={() => AddToCart(item)}
                             >
                               Add to Cart
                             </MDBBtn>
-                          )}
+                          ) : null}
                         </div>
                       </MDBCol>
                     </MDBRow>
@@ -264,11 +312,3 @@ const ViewItems = () => {
   )
 }
 export default ViewItems;
- 
-  
-
-  
-
- 
-
-  
