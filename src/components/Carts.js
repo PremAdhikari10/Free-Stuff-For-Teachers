@@ -20,7 +20,7 @@ import {
     MDBCardText
 } from "mdb-react-ui-kit";
 import { updateDoc } from 'firebase/firestore/lite';
-const Carts = () => {
+function Carts() {
 
     const navigate = useNavigate();
     const [cartCollection, setCartCollection] = useState([]);

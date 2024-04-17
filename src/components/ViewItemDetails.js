@@ -6,7 +6,7 @@ import { toast } from 'react-toastify';
 import { MDBContainer, MDBRow, MDBCol, MDBCard, MDBCardBody, MDBCardImage, MDBCardTitle, MDBBtn } from "mdb-react-ui-kit";
 import "./ViewItems.css";
 import { auth } from '../firebase'; // Assuming you've set up your Firebase configuration in a file named 'firebase.js' in the '../firebase' directory
-
+import { AddToCart } from './AddToCart';
 const ViewItemDetails = () => {
   const { databaseName } = useParams();
   const navigate = useNavigate();
@@ -111,13 +111,23 @@ const ViewItemDetails = () => {
                 <div>
                   <p>Category: {item.category}</p>
                   <p>Donor Name: {item.donorName}</p>
-                  <p>Address: {item.address}</p>
+                  <p>
+                    Address:{" "}
+                    <a
+                      href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: 'underline' }} // Add underline style
+                    >
+                      {item.address}
+                    </a>
+                  </p>
                   <p>Phone Number: {item.phoneNumber}</p>
                   <p>Description: {item.description}</p>
                   {/* Add more item details here */}
                 </div>
                 {role === "Teacher" && (
-                  <MDBBtn onClick={handleAddToCart} outline color="primary" size="sm" className="add-to-cart-button">Add to Cart</MDBBtn>
+                  <MDBBtn  onClick={() => AddToCart(item)} outline color="primary" size="sm" className="add-to-cart-button">Add to Cart</MDBBtn>
                 )}
               </MDBCardBody>
             </MDBCard>

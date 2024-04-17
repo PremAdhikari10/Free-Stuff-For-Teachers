@@ -17,25 +17,25 @@ export const AddToCart = async (item) => {
         const cartRef = doc(db, cartName, "cartQuantity")
         const cartSnapshot = await getDoc(cartRef)
         if (cartSnapshot.exists()) {
-            
-            if(donorQuantity>0){
+
+            if (donorQuantity > 0) {
                 await updateDoc(doc(db, cartName, "cartQuantity"), {
                     cartQuantity: increment(1)
                 })
             }
-            
+
         }
         else {
             const cartName = 'cart' + userEmail;
 
             await setDoc(doc(db, cartName, "cartQuantity"), {
-                cartQuantity:1
+                cartQuantity: 1
             })
         }
 
-       
+
         if (quantitySnapshot.exists()) {
-       
+
             if (donorQuantity !== 0) {
                 if (snapShot.exists()) {
                     await updateDoc(doc(db, userEmail, item.itemName), {
@@ -44,8 +44,9 @@ export const AddToCart = async (item) => {
                     await updateDoc(doc(db, "items", item.databaseName), {
                         quantity: donorQuantity - 1
                     })
-                   // alert("Update1")
-                 toast.success("Item added to cart")
+                    // alert("Update1")
+                    toast.success("Item added to cart")
+                    console.log("item added", item.itemName)
 
                 }
 
@@ -66,6 +67,7 @@ export const AddToCart = async (item) => {
 
                     // alert("Update2") when item is selected first time
                     toast.success("Item added to cart");
+                    console.log("item added 2", item.itemName)
 
 
                 }
@@ -85,7 +87,7 @@ export const AddToCart = async (item) => {
     // toast.success("Item added to cart")
 }
 export const removeCart = async (item) => {
-   
+
     const userEmail = await auth.currentUser.email;
 
     const quantityRef = doc(db, "items", item.databaseName);
@@ -108,12 +110,13 @@ export const removeCart = async (item) => {
             toast.success("Item Removed from Cart");
         }
 
-        if(item.quantity>0){ 
+        if (item.quantity > 0) {
             await updateDoc(doc(db, "items", item.databaseName), {
-            quantity: donorQuantity + 1
-        });}
+                quantity: donorQuantity + 1
+            });
+        }
         // Update donor quantity
-        else{
+        else {
             toast.error("Item Out Of Stock!!")
         }
 
@@ -128,7 +131,7 @@ export const removeCart = async (item) => {
             });
         }
 
-       
+
     }
 
 }
