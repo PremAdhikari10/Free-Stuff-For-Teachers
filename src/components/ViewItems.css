@@ -3,3 +3,8 @@
       border-left: none !important;
     }
   }
+  .item-image {
+    max-width: 50%;
+    height: auto;
+  }
+  

@@ -15,20 +15,10 @@ export default function Registration() {
   const [password, setPassword] = useState("")
   const [role, setRole] = useState("")
 
-  // const [formData, setFormData] = useState({
-  //   name: "",
-  //   email: "",
-  //   password: "",
-  // });
+  
 
-  // const { name, email, password } = formData;
   const navigate = useNavigate();
-  // function onChange(e) {
-  //   setFormData((prevState) => ({
-  //     ...prevState,
-  //     [e.target.id]: e.target.value,
-  //   }))
-  // }
+  
 
   const onSubmit = async(e)=> {
    
@@ -64,12 +54,7 @@ export default function Registration() {
         e.preventDefault();
         console.log(role)
 
-        // else if (password.length >= 8) {
-        //   if (password !== cPassword) {
-        //     toast.error("Password didn't match")
-        //     e.preventDefault();
-        //   }
-        // }
+        
       }
       else if(role==="") {
         toast.error("Please select the role")
@@ -83,9 +68,7 @@ export default function Registration() {
           })
 
           const user = userCredential.user;
-          // const formDataCopy = { ...formData };
-          // delete formDataCopy.password;
-          // formDataCopy.timestamp = serverTimestamp();
+          
 
           await setDoc(doc(db, "users", user.uid), {
             name: name,

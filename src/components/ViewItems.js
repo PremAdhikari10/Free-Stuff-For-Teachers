@@ -21,17 +21,19 @@ import { MdOutlineProductionQuantityLimits } from "react-icons/md";
 import { getStorage, ref, deleteObject } from 'firebase/storage';
 
 
+
 const ViewItems = () => {
   const [itemValue, setItemValue] = useState("");
   const [items, setItems] = useState([]);
   const [currentUser, setCurrentUser] = useState("");
   const [itemCollection, setItemCollection] = useState([]);
-  const [role, setRole] = useState();
+  const [role, setRole] = useState(); 
   const [selectedCategory, setSelectedCategory] = useState('');
-  const [categories, setCategories] = useState([]);
  
+  const [categories, setCategories] = useState([]);
+    const [updatedItemCollection, setUpdatedItemCollection] = useState([]);
   const navigate = useNavigate("/")
-  
+
   useEffect(() => {
     // Firebase Auth listener
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -75,6 +77,7 @@ const ViewItems = () => {
 
   }
 
+
   //all items:
   const getItems = async () => {
     try {
@@ -83,7 +86,7 @@ const ViewItems = () => {
       querySnapshot.forEach(doc => {
         allItems.push(doc.data());
       });
-     // console.log(allItems);
+      // console.log(allItems);
       // Check the data being fetched
       setItemCollection(allItems);
     } catch (error) {
@@ -93,24 +96,7 @@ const ViewItems = () => {
 
   }
 
-  const test = async(item) => {
-    console.log(item)
-  }
-//get user item:
-const getStock = async(item)=> {
-  if (parseInt(item.quantity) === 1) {
-   setItemValue("Nearly Out of Stock")
-  }
-  else if (parseInt(item.quantity === 0)) {
-    setItemValue ("Out of Stock")
-  }
-  else {
-    setItemValue("")
-  }
-}
-
   //delete items
-
   const deleteItem = async (databaseName) => {
     if (window.confirm("Are you sure you want to delete the item?")) {
       try {
@@ -130,6 +116,9 @@ const getStock = async(item)=> {
   function onEdit(databaseName) {
     navigate(`/edit-items/${databaseName}`);
   }
+  function ViewDetails(databaseName){
+    navigate (`/view-details/${databaseName}`)
+  }
   const fetchCategories = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'categories'));
@@ -140,7 +129,26 @@ const getStock = async(item)=> {
       navigate('/');
     }
   };
- 
+  useEffect(() => {
+    // Fetch updated quantities after adding to cart
+    fetchUpdatedQuantities();
+  }, [updatedItemCollection]); // Run the effect when updatedItemCollection changes
+
+  const fetchUpdatedQuantities = async () => {
+    try {
+      const updatedItems = [];
+      for (const item of itemCollection) {
+        const docRef = doc(db, 'items', item.databaseName);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          updatedItems.push(docSnap.data());
+        }
+      }
+      setUpdatedItemCollection(updatedItems);
+    } catch (error) {
+      // toast.error("Error fetching updated quantities:", error);
+    }
+  };
   return (
     <div>
       <h4 className="mt-4 mb-5 text-center">
@@ -164,7 +172,7 @@ const getStock = async(item)=> {
         </select>
       </div>
 
-      {itemCollection
+      {updatedItemCollection
         .filter((item) => !selectedCategory || item.category === selectedCategory)
         .map((item, index) => (
           <MDBContainer fluid key={index}>
@@ -179,6 +187,7 @@ const getStock = async(item)=> {
                           rippleTag="div"
                           className="bg-image rounded hover-zoom hover-overlay"
                         >
+                          <Link to={`/view-details/${item.databaseName}`}>
                           <MDBCardImage
                             src={item.imageURL}
                             fluid
@@ -190,8 +199,10 @@ const getStock = async(item)=> {
                               style={{ backgroundColor: 'rgba(251, 251, 251, 0.15)' }}
                             ></div>
                           </a>
+                          </Link>
                         </MDBRipple>
                       </MDBCol>
+                     
                       <MDBCol md="6">
                         <h5>{item.itemName}</h5>
                         <div className="d-flex flex-row">
@@ -225,12 +236,36 @@ const getStock = async(item)=> {
                           <span className="text-danger">
                             Quantity: {item.quantity}
                           </span>
-                          <p>{()=>getStock(item)}</p>
-                          <p>{itemValue}</p>
                         </div>
-                        <h6 className="text-success">Free Items</h6>
+                        <h6 className="text-success">
+                        {item.quantity <= 1 && item.quantity !=0 ? (
+                        <>
+                          <p>Almost out of Stock</p>
+                        </>
+                      ) : (
+                        <>
+                        
+                        </>
+                      )}
+                      {item.quantity === 0 ? (
+                        <>
+                          <p>Out of Stock</p>
+                        </>
+                      ) : (
+                        <>
+                        </>
+                      )}
+                      {item.quantity>1? (
+                        <>
+                          <p>Avaialable for free</p>
+                        </>
+                      ) : (
+                        <>
+                        </>
+                      )}
+                        </h6>
                         <div className="d-flex flex-column mt-4">
-                          <MDBBtn color="primary" size="sm">
+                          <MDBBtn color="primary" size="sm" onClick={()=>ViewDetails(item.databaseName)}>
                             View Details
                           </MDBBtn>
                           {currentUser && currentUser.uid === item.userRef ? (
@@ -248,22 +283,22 @@ const getStock = async(item)=> {
                                 color="primary"
                                 size="sm"
                                 className="mt-2"
-                                onClick={()=>onEdit(item.databaseName)}
+                                onClick={() => onEdit(item.databaseName)}
                               >
                                 Edit Item
                               </MDBBtn>
                             </>
-                          )  : role === 'Teacher'?(
+                          ) : role === 'Teacher' ? (
                             <MDBBtn
                               outline
                               color="primary"
                               size="sm"
                               className="mt-2"
-                              onClick={()=>AddToCart(item)}
+                              onClick={() => AddToCart(item)}
                             >
-                             Add to Cart
+                              Add to Cart
                             </MDBBtn>
-                          ):null}
+                          ) : null}
                         </div>
                       </MDBCol>
                     </MDBRow>
@@ -277,11 +312,3 @@ const getStock = async(item)=> {
   )
 }
 export default ViewItems;
- 
-  
-
-  
-
- 
-
-  
