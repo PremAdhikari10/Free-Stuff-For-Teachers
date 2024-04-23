@@ -10,17 +10,17 @@ const Footer = () => {
         <div className='footer_col'>
           <img src={Logo} alt='logo'/>
           <p>
-            The ultimate goal of classroom management.
+          Donors and Teachers Unite for Impact
           </p>
         </div>
         <div className='footer_col'>
           <h3>Contact Us</h3>
           <ul className="contact-list">
             <li>
-              <MDBIcon fas icon="phone" size="lg" />  Phone: +1234567890
+              <MDBIcon fas icon="phone" size="lg" />  Phone: (972)-799-9044
             </li>
             <li>
-              <MDBIcon fas icon="map-marker-alt" size="lg" /> Address: 123 Street Name, City, Country
+              <MDBIcon fas icon="map-marker-alt" size="lg" /> Address: 3940 N Elm St, Denton, TX, United States, 76207
             </li>
           </ul>
         </div>
